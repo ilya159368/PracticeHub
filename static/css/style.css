@@ -1,0 +1,37 @@
+html, body, .t-b {
+    height: 100%;
+}
+
+.my-search-form {
+    position: relative;
+}
+
+.my-search-form>input {
+    padding-right: 2rem;
+}
+
+.my-search-icon {
+    position: absolute;
+    right: 1.2rem;
+    top: .4rem;
+}
+
+.w-625 {
+    width: 62.5%;
+}
+
+.no-image {
+    background-image: none!important;
+}
+
+.mb-3rem {
+    margin-bottom: 3rem!important;
+}
+
+.mt-5rem {
+    margin-top: 5rem!important;
+}
+
+.w-45 {
+    width: 45%!important;
+}
