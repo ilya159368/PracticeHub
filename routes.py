@@ -77,4 +77,11 @@ def teaching():
 @app.route('/create_course', methods=['GET', 'POST'])
 @login_required
 def create_course():
+    form = DescForm()
+    if form.validate_on_submit():
+        course = Course(name=form.username.data, desc=form.email.data)
+        course.author_id = current_user.id
+        db.session.add(course)
+        db.session.commit()
+        return redirect(url_for(''))
     return render_template('create_course.html')
