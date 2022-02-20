@@ -54,13 +54,27 @@ def register():
                            is_post=True if request.method == 'POST' else False)
 
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profiles/<int:id>', methods=['GET', 'POST'])
 @login_required
-def profile():
-    return render_template('profile.html', user=current_user)
+def profile(id):
+    user = User.query.filter_by(id=id).first()
+
+    return render_template('profile.html', user=user)
 
 
 @app.route('/news', methods=['GET', 'POST'])
 @login_required
 def news():
     return 'news'
+
+
+@app.route('/teaching', methods=['GET'])
+@login_required
+def teaching():
+    return render_template('teaching.html')
+
+
+@app.route('/create_course', methods=['GET', 'POST'])
+@login_required
+def create_course():
+    return render_template('create_course.html')

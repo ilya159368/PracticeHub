@@ -1,3 +1,8 @@
+:root {
+    --light-gray: #e6e6e6;
+    --mid-gray: #586273;
+}
+
 html, body, .t-b {
     height: 100%;
 }
@@ -16,8 +21,12 @@ html, body, .t-b {
     top: .4rem;
 }
 
+.w-55 {
+    width: 55%!important;
+}
+
 .w-625 {
-    width: 62.5%;
+    width: 62.5%!important;
 }
 
 .no-image {
@@ -28,10 +37,49 @@ html, body, .t-b {
     margin-bottom: 3rem!important;
 }
 
-.mt-5rem {
-    margin-top: 5rem!important;
+.mt-profile {
+    margin-top: 6rem!important;
 }
 
 .w-45 {
     width: 45%!important;
+}
+
+.w-profile {
+        width: 50%;
+    }
+
+@media (max-width: 992px) {
+    /* profile */
+    .mt-profile {
+        margin-top: 2rem!important;
+    }
+    .row-profile {
+        margin-bottom: 3rem;
+    }
+    .row-profile > div {
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .row-profile > div, .row-profile > div > img {
+        width: 45%;
+    }
+    .w-profile {
+        width: 75%;
+    }
+    /* teaching */
+    .teaching {
+        margin-right: auto;
+    }
+}
+
+.no-focus:focus {
+    box-shadow: none !important;
+}
+
+.toggler-active {
+    background-color: var(--bs-secondary)!important;
+    color: white!important;
+    font-weight: normal!important;
+    cursor: default;
 }

@@ -1,39 +1,41 @@
 {% extends 'base.html' %}
 {% block title %}Профиль{% endblock title %}
 {% block content %}
-  <div class="w-50 mx-auto">
-    <h1 class="text-center">Профиль</h1>
-    <div class="row mt-5rem">
-      <div class="col-10 px-0">
-        <div class="row h5 mb-3">
-          <span>
-            Имя пользователя: {{ user.username }}
-            <a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
-          </span>
-        </div>
-        <div class="row h5 mb-4">
-          <span>
-            Email: {{ user.email }}
-            <a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
-          </span>
-        </div>
-        <div class="row h6">
-          <span class="mb-1">Создано курсов: {{ courses_cnt or 123 }}</span>
-          <span>Создано статей: {{ posts_cnt or 123 }}</span>
-        </div>
+<div class="w-profile mx-auto">
+  <h1 class="text-center">Профиль</h1>
+  <div class="row mt-profile">
+    <div class="col-lg-10 col-xs-12 px-0 order-2 order-lg-1">
+      <div class="row h5 mb-3">
+        <span>
+          Имя пользователя: {{ user.username }}&nbsp;<a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
+        </span>
       </div>
-      <div class="col-2">
-        <div class="row">
-          <img src="https://useyourloaf.com/blog/masked-and-animated-corners/001.png" alt="пусто" class="border border-dark p-0" style="width: 100%">
-        </div>
-        <div class="row text-center">
-          <a href="#" class="primary-link">Изменить</a>
-        </div>
+      <div class="row h5 mb-4">
+        <span>
+          Email: {{ user.email }}&nbsp;<a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
+        </span>
+      </div>
+      <div class="row h6">
+        <span class="mb-1">Создано курсов: {{ courses_cnt or 123 }}</span>
+        <span>Создано статей: {{ posts_cnt or 123 }}</span>
       </div>
     </div>
-    <div class="row justify-content-between mt-5">
-      <a href="#" class="btn btn-outline-primary w-45">Изменить пароль</a>
-      <a href="#" class="btn btn-outline-primary w-45">Удалить аккаунт</a>
+    <div class="col-lg-2 col-xs-12 order-1 order-lg-2 row-profile">
+      <div class="row">
+        <img src="https://useyourloaf.com/blog/masked-and-animated-corners/001.png" alt="пусто" class="border border-dark p-0" style="width: 100%">
+      </div>
+      <div class="row text-center">
+        <a href="#" class="primary-link px-0">Изменить</a>
+      </div>
     </div>
   </div>
+  <div class="row justify-content-between mt-5">
+    <a href="#" class="btn btn-outline-primary w-45">Изменить пароль</a>
+    <a href="#" class="btn btn-outline-primary w-45">Удалить аккаунт</a>
+  </div>
+</div>
 {% endblock content %}
+{% block script %}
+<script>
+</script>
+{% endblock script %}

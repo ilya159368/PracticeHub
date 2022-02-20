@@ -14,7 +14,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
       <div>
-        <span class="navbar-brand">logo</span>
+        <span class="navbar-brand">PracticeHub</span>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -25,9 +25,9 @@
           <img src="https://useyourloaf.com/blog/masked-and-animated-corners/001.png" alt="пусто" height="40" width="40">
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-          <li><a class="dropdown-item" href="{{ url_for('profile') }}">Профиль</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('profile', id=current_user.id) }}">Профиль</a></li>
           <li><a class="dropdown-item" href="#">Мои курсы</a></li>
-          <li><a class="dropdown-item" href="#">Преподавание</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('teaching') }}">Преподавание</a></li>
           <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a></li>
         </ul>
       </div>
@@ -73,5 +73,8 @@
   </div>
   {# scripts #}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  {% block script %}
+  {% endblock script %}
 </body>
 </html>
