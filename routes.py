@@ -3,8 +3,8 @@ from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 
 from app import app, db
-from forms import LoginForm, RegistrationForm
-from models import User, load_user
+from forms import LoginForm, RegistrationForm, CreateLesson
+from models import User, load_user, Course, Lesson
 
 
 @app.route('/')
@@ -71,7 +71,8 @@ def news():
 @app.route('/teaching', methods=['GET'])
 @login_required
 def teaching():
-    return render_template('teaching.html')
+    courses = Course.query.filter_by(author_id=current_user.id).all()
+    return render_template('teaching.html', courses=courses)
 
 
 @app.route('/create_course', methods=['GET', 'POST'])
@@ -85,3 +86,24 @@ def create_course():
         db.session.commit()
         return redirect(url_for(''))
     return render_template('create_course.html')
+
+
+@app.route('/create_lessons/<id>', methods=['GET', 'POST'])
+@login_required
+def create_lessons(id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+
+    course = Course.query.filter_by(id=id).first()
+    lessons = Lesson.query.filter_by(course_id=course.id).all()
+
+    if User.query.filter_by(username=current_user.username).first().id == course.author_id:
+        form = CreateLesson()
+        if form.validate_on_submit():
+            lesson = Lesson(name="Новый урок", course_id=course.id)
+            db.session.add(lesson)
+            db.session.commit()
+            lessons = Lesson.query.filter_by(course_id=course.id).all()
+        return render_template('lessons.html', course=course, lessons=lessons, form=form)
+
+    return redirect(url_for('index'))
