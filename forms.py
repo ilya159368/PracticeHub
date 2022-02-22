@@ -37,3 +37,8 @@ class CourseDescForm(FlaskForm):
     desc = TextAreaField("Описание", validators=[DataRequired()])
     img = FileField("Картинка")
     save = SubmitField("Сохранить")
+
+
+
+class CreateLesson(FlaskForm):
+    submit = SubmitField('Создать урок')

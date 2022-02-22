@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}Преподавание{% endblock title %}
 {% block content %}
-<div class="row">
-  <div class="col-lg-4"></div>
-  <div class="col-lg-4 col-xs-12 px-0 my-auto ">
-    <div class="rounded-pill justify-content-between d-flex align-items-center p-2 ms-auto teaching" style="background-color: var(--light-gray); width: 85%; height: 80%;">
+
+  <div class="w-50 px-0 m-auto">
+    <div class="mx-auto rounded-pill justify-content-between d-flex align-items-center p-2 teaching" style="background-color: var(--light-gray); width: 85%; height: 80%;">
       <button class="rounded-pill px-2 btn no-focus toggler-active" id="check" style="width: 50%; font-weight: 500">
         <span class="h4">проверка</span>
         </button>
@@ -13,28 +12,24 @@
       </button>
     </div>
   </div>
-  <div class="col-lg-4 px-0 justify-content-end align-items-center d-flex mt-2">
-    <a href="{{ url_for('create_course') }}" class="btn btn-secondary py-auto w-50 d-none" id="create"><span class="h5">Создать курс&nbsp;<i class="bi bi-plus-circle"></i></span></a>
+  <div class="w-50 px-0 justify-content-end align-items-center d-flex my-4 mx-auto">
+    <a href="{{ url_for('create_course') }}" class="btn btn-secondary py-auto w-50 d-none mx-auto" id="create"><span class="h5">Создать курс&nbsp;<i class="bi bi-plus-circle"></i></span></a>
   </div>
 </div>
 {# content #}
-{#<div class="w-75 mx-auto">#}
-{#  <div id="check-div">#}
-{#  </div>#}
-{#  <div class="d-none" id="courses-div">#}
-{#    {% for c in courses %}#}
-{#    <div class="row">#}
-{#      <div class="col-2">#}
-{#        <img src="https://useyourloaf.com/blog/masked-and-animated-corners/001.png" alt="картинка" class="w-100">#}
-{#      </div>#}
-{#      <div class="col-10">#}
-{#        <span class="h1">{{ c.name }}</span>#}
-{#        <p>{{ c.description[:30] }}</p>#}
-{#      </div>#}
-{#    </div>#}
-{#    {% endfor %}#}
-{#  </div>#}
-{#</div>#}
+<div class="w-75 mx-auto">
+  <div id="check-div">
+
+  </div>
+  <div class="d-none" id="courses-div">
+    {% for c in courses %}
+      <div class="row">
+        {% include "includes/course_thumbnail_teacher.html" %}
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+
 {% endblock content %}
 {% block script %}
 <script>
@@ -48,19 +43,20 @@
             if (check.hasClass('toggler-active')) return;
             check.addClass('toggler-active');
             courses.removeClass('toggler-active');
-            courses_div.removeClass('d-none');
-            check_div.addClass('d-none');
+            courses_div.addClass('d-none');
+            check_div.removeClass('d-none');
             create.addClass('d-none');
         });
         courses.click(function() {
             if (courses.hasClass('toggler-active')) return;
             courses.addClass('toggler-active');
             check.removeClass('toggler-active');
-            check_div.removeClass('d-none');
-            courses_div.addClass('d-none');
+            check_div.addClass('d-none');
+            courses_div.removeClass('d-none');
             create.removeClass('d-none');
 
         });
     });
 </script>
+
 {% endblock script %}
