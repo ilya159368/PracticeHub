@@ -83,3 +83,11 @@ html, body, .t-b {
     font-weight: normal!important;
     cursor: default;
 }
+
+.search-text::placeholder {
+    color: rgba(190, 190, 190, 1)!important;
+}
+
+.search-text {
+    color: white!important;
+}
