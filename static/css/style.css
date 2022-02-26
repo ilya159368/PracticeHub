@@ -78,8 +78,28 @@ html, body, .t-b {
 }
 
 .toggler-active {
-    background-color: var(--bs-secondary)!important;
     color: white!important;
     font-weight: normal!important;
     cursor: default;
+    background: rgba(142,18,254,1);
+    background: linear-gradient(130deg, rgba(142,18,254,1) 0%, rgba(13,58,190,1) 100%);
+    font-size: 16px;
+    transition: all 0.5s;
+}
+
+.toggler-inactive {
+    color: rgba(0, 0, 0, 0.5)!important;
+    font-weight: normal!important;
+    cursor: default;
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 14px;
+    transition: all 0.5s;
+}
+
+.search-text::placeholder {
+    color: rgba(190, 190, 190, 1)!important;
+}
+
+.search-text {
+    color: white!important;
 }

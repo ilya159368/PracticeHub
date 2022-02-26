@@ -1,30 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}Создание курса{% endblock title %}
 {% block content %}
-<div class="row mt-profile">
-  <div class="col-lg-2 col-xs-12">
-    <div class="row">
-      <img src="https://useyourloaf.com/blog/masked-and-animated-corners/001.png" alt="пусто" class="border border-dark p-0" style="width: 100%">
+<form class="w-75 mx-auto" action="" method="post" style="margin-top: 8rem">
+  {{ form.hidden_tag() }}
+  <div class="row">
+    <div class="col-3">
+      <img class="w-100" src="https://cdn.discordapp.com/attachments/917080744843706418/945760855902027858/IMG_20220222_221550_060.jpg" style="margin-top: 2rem">
+      {{ form.name(class="w-100 form-control mt-1", placeholder="Название") }}
     </div>
-    <div class="row text-center">
-      <a href="#" class="primary-link px-0">Изменить</a>
+    <div class="col-6">
+      <div class="mx-auto" style="width: 90%">
+        <span style='font-family: "Roboto", sans-serif; font-size: 28px'>Описание курса</span>
+        {{ form.desc(class="form-control w-100", style="resize: none; margin-top: 1rem", rows=19) }}
+      </div>
     </div>
-  </div>
-  <div class="col-lg-10 col-xs-12 px-0">
-    <div class="row h5 mb-3">
-      <span>
-        Имя пользователя:&nbsp;<a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
-      </span>
-    </div>
-    <div class="row h5 mb-4">
-      <span>
-        Email: &nbsp;<a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
-      </span>
-    </div>
-    <div class="row h6">
-      <span class="mb-1">Создано курсов:</span>
-      <span>Создано статей:</span>
+    <div class="col-3">
+
     </div>
   </div>
-</div>
+</form>
 {% endblock content %}

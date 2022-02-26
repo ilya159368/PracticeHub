@@ -3,7 +3,7 @@ from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 
 from app import app, db
-from forms import LoginForm, RegistrationForm, CreateLesson
+from forms import LoginForm, RegistrationForm, CourseDescForm, CreateLesson
 from models import User, load_user, Course, Lesson
 
 
@@ -78,14 +78,14 @@ def teaching():
 @app.route('/create_course', methods=['GET', 'POST'])
 @login_required
 def create_course():
-    form = DescForm()
+    form = CourseDescForm()
     if form.validate_on_submit():
-        course = Course(name=form.username.data, desc=form.email.data)
+        course = Course(name=form.name.data, description=form.desc.data)
         course.author_id = current_user.id
         db.session.add(course)
         db.session.commit()
-        return redirect(url_for(''))
-    return render_template('create_course.html')
+        return redirect(url_for('teaching'))
+    return render_template('create_course.html', form=form)
 
 
 @app.route('/create_lessons/<id>', methods=['GET', 'POST'])

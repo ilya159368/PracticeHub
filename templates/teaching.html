@@ -3,17 +3,17 @@
 {% block content %}
 
   <div class="w-50 px-0 m-auto">
-    <div class="mx-auto rounded-pill justify-content-between d-flex align-items-center p-2 teaching" style="background-color: var(--light-gray); width: 85%; height: 80%;">
-      <button class="rounded-pill px-2 btn no-focus toggler-active" id="check" style="width: 50%; font-weight: 500">
-        <span class="h4">проверка</span>
+    <div class="mx-auto rounded-pill justify-content-between d-flex align-items-center p-2 teaching" style="background-color: rgb(230, 230, 230); width: 85%; height: 80%; box-shadow: 0 0 40px rgba(0, 0, 0, 0.1)">
+      <button class="rounded-pill px-1 btn no-focus toggler-active" id="check" style="width: 50%; font-weight: 500;">
+        <span class="h4">Проверка</span>
         </button>
-      <button class="rounded-pill px-2 btn no-focus" id="courses" style="width: 45%; font-weight: 500">
-        <span class="h4">мои курсы</span>
+      <button class="rounded-pill px-1 btn no-focus toggler-inactive" id="courses" style="width: 45%; font-weight: 500;">
+        <span class="h4">Мои курсы</span>
       </button>
     </div>
   </div>
   <div class="w-50 px-0 justify-content-end align-items-center d-flex my-4 mx-auto">
-    <a href="{{ url_for('create_course') }}" class="btn btn-secondary py-auto w-50 d-none mx-auto" id="create"><span class="h5">Создать курс&nbsp;<i class="bi bi-plus-circle"></i></span></a>
+    <a href="{{ url_for('create_course') }}" class="btn py-auto w-25 d-none mx-auto" id="create" style="color: #ffffff; background-color: rgb(0, 85, 255); box-shadow: 0 0 10px rgba(0, 85, 255, 0.4)"><span class="h5">Создать курс&nbsp;<i class="bi bi-plus-circle"></i></span></a>
   </div>
 </div>
 {# content #}
@@ -42,7 +42,9 @@
         check.click(function() {
             if (check.hasClass('toggler-active')) return;
             check.addClass('toggler-active');
+            check.removeClass('toggler-inactive');
             courses.removeClass('toggler-active');
+            courses.addClass("toggler-inactive");
             courses_div.addClass('d-none');
             check_div.removeClass('d-none');
             create.addClass('d-none');
@@ -50,11 +52,12 @@
         courses.click(function() {
             if (courses.hasClass('toggler-active')) return;
             courses.addClass('toggler-active');
+            courses.removeClass('toggler-inactive');
             check.removeClass('toggler-active');
+            check.addClass('toggler-inactive');
             check_div.addClass('d-none');
             courses_div.removeClass('d-none');
             create.removeClass('d-none');
-
         });
     });
 </script>
