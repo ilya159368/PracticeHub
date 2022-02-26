@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2 align="center">{{ course.name }}</h2>
+
+  <div style="display: flex; justify-content: center; align-items: center;">
+    <!--<button class="btn btn-secondary">Создать урок</button>-->
+    <form method="post">
+    {{ form.hidden_tag() }}
+    {{ form.submit(type="submit", class="btn btn-secondary") }}
+    </form>
+  </div>
+
+  <div class="container mx-auto col-sm-8">
+    {% for lesson in lessons|reverse %}
+      <div class="row border rounded-3 my-4 shadow" style="background-color: #f7f7f5;">
+        <h5 class="my-3">{{ lesson.name }}</h5>
+      </div>
+    {% endfor %}
+  </div>
+
+
+{% endblock %}
