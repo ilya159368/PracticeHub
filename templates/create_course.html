@@ -1,22 +1,59 @@
 {% extends 'base.html' %}
 {% block title %}Создание курса{% endblock title %}
 {% block content %}
-<form class="w-75 mx-auto" action="" method="post" style="margin-top: 8rem">
+<form class="w-100 mx-auto" action="" method="post" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
   <div class="row">
     <div class="col-3">
-      <img class="w-100" src="https://cdn.discordapp.com/attachments/917080744843706418/945760855902027858/IMG_20220222_221550_060.jpg" style="margin-top: 2rem">
-      {{ form.name(class="w-100 form-control mt-1", placeholder="Название") }}
+      <h3 style='font-family: "Roboto", sans-serif'>Изображение</h3>
     </div>
     <div class="col-6">
-      <div class="mx-auto" style="width: 90%">
-        <span style='font-family: "Roboto", sans-serif; font-size: 28px'>Описание курса</span>
-        {{ form.desc(class="form-control w-100", style="resize: none; margin-top: 1rem", rows=19) }}
-      </div>
+      <h3 style='font-family: "Roboto", sans-serif'>Описание курса</h3>
     </div>
     <div class="col-3">
-
+      <h3 style='font-family: "Roboto", sans-serif'>Коротко о курсе</h3>
+    </div>
+  </div>
+  <div class="row" style="height: 65vh;">
+    <div class="col-3 text-center d-flex flex-column justify-content-between">
+      <img class="w-100 d-none" src="#" alt="" id="img">
+      {{ form.img(class="w-100 mb-5 d-block form-control", aria_label="select image", type="file") }}
+      {{ form.name(class="w-100 form-control mt-1 mt-auto mb-0", placeholder="Название", style="font-size: 1.3rem") }}
+    </div>
+    <div class="col-6">
+      {{ form.desc(class="form-control h-100", style="resize: none; width: 100%") }}
+    </div>
+    <div class="col-3">
+      {{ form.short_desc(class="form-control h-100", style="resize: none; width: 100%") }}
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-3"></div>
+    <div class="col-6">
+    </div>
+    <div class="col-3">
+      {{ form.submit(class="w-100 mbgc btn d-block") }}
     </div>
   </div>
 </form>
 {% endblock content %}
+{% block script %}
+<script>
+  $(function () {
+      let img = $('#img')
+      function readImg(input) {
+          let reader = new FileReader();
+          reader.onload = function(e) {
+              img.attr('src', e.target.result);
+          }
+          reader.readAsDataURL(input.files[0]);
+      }
+      $('input:file').change(function () {
+          if ($(this).val()) {
+               img.removeClass('d-none').addClass('mb-3');
+               readImg($(this)[0]);
+          } else img.removeClass('mb-3').addClass('d-none');
+      });
+  });
+</script>
+{% endblock %}

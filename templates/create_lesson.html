@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% block title %}Создание урока{% endblock title %}
+{% block content %}
+<form enctype="multipart/form-data" id="lesson_form" method="post">
+  <div class="row">
+    <div class="col-1">
+      <div class="d-flex justify-content-start px-3 py-3 rounded-pill flex-column align-items-center h-100" style="background-color: var(--light-gray);">
+        <button id="c1" class="rounded-circle btn my-1 active-circle d-block c" style="width: 3em; height: 3em" type="button"></button>
+        <button class="rounded-circle btn mbgc my-1 d-flex justify-content-center align-items-center no-focus" style="width: 3em; height: 3em" type="button" id="add_btn">
+          <i class="bi bi-plus-circle" style="color: #fff; font-size: 1.5em;"></i>
+        </button>
+      </div>
+    </div>
+    <div class="col-11 d-flex flex-column">
+      <div class="row">
+        <div class="col-lg-9 col-xs-12">
+          <input type="text" aria-label="title" placeholder="Название" name="title" class="form-control mx-auto" style="font-size: 1.5rem">
+        </div>
+        <div class="col-lg-3 col-xs-12 justify-content-end d-flex">
+          <button type="button" class="btn mbgc w-75 d-block" style="font-size: 1.4rem" id="resources" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Ресурсы</button>
+        </div>
+      </div>
+      <div class="row mt-5 flex-grow-1">
+        <div class="col-12">
+          <textarea name="" id="ta1" class="form-control h-100 d-block ta" aria-label="content" style="min-height: 20rem;"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-1"></div>
+    <div class="col-5">
+      <button class="btn mbgc w-625 d-block py-2 disabled" type="button" id="del_page"><span class="h5 mt-0">Удалить текущую страницу</span></button>
+    </div>
+    <div class="col-6">
+      <button class="btn mbgc w-625 ms-auto d-block py-2" type="submit"><span class="h5 mt-0">Сохранить урок</span></button>
+    </div>
+  </div>
+  <div class="w-75 h-75 rounded d-flex flex-column px-2n d-none" style="position: absolute; right: 12.5%; top: 12.5%; background-color: white; z-index: 3; overflow-y: auto;" id="resources_window">
+    <button class="btn no-focus" id="close_resources" style="position: absolute; right: 1.5%; top: 3%" type="button"><i class="bi bi-x-lg" style="font-size: larger"></i></button>
+    <div class="w-75 d-flex flex-column mt-5 mx-auto" id="list">
+      <button class="mx-auto btn no-focus p-0 d-flex align-items-center justify-content-between text-black-50 mb-5" id="add_res_btn" style="width: 33%" type="button"><i class="bi bi-plus-circle h2 mb-0"></i><span class="h3 mb-0" style="font-weight: normal">Добавить ресурс</span></button>
+    </div>
+  </div>
+</form>
+<div class="w-100 h-100 d-none" style="position: absolute; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 2" id="darker_bg"></div>
+{% endblock content %}
+{% block script %}
+<script>
+  $(function () {
+      let activeC = $('#c1')
+      let activeTA = $('#ta1')
+      let page_cnt = 1
+      let darker_bg = $('#darker_bg')
+      let resources_window = $('#resources_window')
+      let del_page_btn = $('#del_page')
+      let r_cnt = 0
+      let res_names = []
+      let lastRN = null
+      let lastR = null
+      let lastRF = null
+      let last_c_id = 1
+
+      function toggle (_new) {
+          {#alert(activeC.attr('id'))#}
+          activeC.removeClass('active-circle');
+          activeC.addClass('circle');
+          activeC = _new;
+          {#alert(activeC.attr('id'))#}
+          activeC.addClass('active-circle');
+          activeC.removeClass('circle');
+          activeTA.addClass('d-none');
+          {#alert(_new.attr('id'))#}
+          activeTA = $(`#${_new.attr('id').replace('c', 'ta')}`);
+          activeTA.removeClass('d-none');
+      }
+
+      function check_del_page_btn() {
+          if (page_cnt > 1) del_page_btn.removeClass('disabled');
+          else if (! del_page_btn.hasClass('disabled')) del_page_btn.addClass('disabled');
+      }
+
+      $('#add_btn').click(function () {
+          $(`#c${last_c_id}`).after(`<button id="c${last_c_id + 1}" class="rounded-circle btn my-1 circle d-block c" style="width: 3em; height: 3em" type="button"></button>`)
+          page_cnt += 1;
+          last_c_id += 1;
+          activeTA.after(`<textarea name="" id="ta${last_c_id}" class="form-control h-100 ta" aria-label="content" style="min-height: 20rem;"></textarea>`)
+          let newBtn = $(`#c${last_c_id}`);
+          toggle(newBtn);
+          newBtn.click(function () {
+              toggle($(this));
+          });
+          check_del_page_btn();
+      })
+      $('.active-circle').click(function () {
+          toggle($(this));
+      })
+      $('#resources').click( function () {
+          darker_bg.removeClass('d-none')
+          resources_window.removeClass('d-none')
+      })
+      $('#close_resources').click( function () {
+          darker_bg.addClass('d-none')
+          resources_window.addClass('d-none')
+      })
+      $('#add_res_btn').click( function () {
+          if (lastRN) {
+              let temp_cnt = 0;
+              if (!lastRN.val()) {
+                  lastRN.addClass('is-invalid');
+                  temp_cnt += 1;
+              }
+              if (!lastR.val()) {
+                  lastR.addClass('is-invalid');
+                  temp_cnt += 1;
+              }
+              if (res_names.indexOf(lastRN.val()) !== -1) {
+                  lastRF.removeClass('d-none');
+                  lastRN.addClass('is-invalid');
+                  temp_cnt += 1;
+              }
+              if (temp_cnt) return;
+
+              // process
+              res_names.push(lastRN.val());
+          }
+          r_cnt += 1;
+          $(this).before(`<div class="d-flex justify-content-between mb-4 res">
+                            <div style="width: 40%">
+                              <input class="form-control" type="text" placeholder="Название ресурса" name="" id="rn${r_cnt}" aria-label="resource name">
+                              <span class="invalid-feedback d-none" id="rf${r_cnt}">Такое название уже существует</span>
+                            </div>
+                            <div style="width: 40%">
+                              <input class="form-control" type="file"  name="" id="r${r_cnt}" aria-label="resource">
+                              <span class="invalid-feedback"></span>
+                            </div>
+                            <button style="width: 10%" class="btn p-0 del-res-btn"><i class="bi bi-dash-circle h2"></i></button>
+                          </div>`);
+          if (lastRN) {
+              lastRN.off();
+              lastR.off();
+          }
+          lastRN = $(`#rn${r_cnt}`);
+          lastR = $(`#r${r_cnt}`);
+          lastRF = $(`#rf${r_cnt}`);
+          lastRN.on('input', function () {
+              $(this).removeClass('is-invalid');
+              lastRF.addClass('d-none');
+          });
+          lastR.on('change', function () {
+              $(this).removeClass('is-invalid');
+          });
+          $('.del-res-btn').click(function () {
+              let id = $(this).parent().find('div > input[type="text"]').val()
+              let index = res_names.indexOf(id);
+              if (index !== -1) res_names.splice(index, 1);
+              r_cnt -= 1
+              lastRN = null;
+              lastR = null;
+              lastRF = null;
+              $(this).parent().remove();
+          });
+          if (resources_window.prop("scrollHeight") > resources_window.prop("clientHeight")) resources_window.scrollTop(resources_window.prop("scrollHeight"));
+      });
+      del_page_btn.click(function () {
+          let c = $('.c')
+          let index = c.index(activeC)
+          {#let number = +activeC.attr('id').slice(1)#}
+          if (c[index - 1]) index -= 1;
+          else index += 1;
+          activeC.remove();
+          activeTA.remove();
+          toggle($(c.get(index)));
+          page_cnt -= 1;
+          check_del_page_btn();
+      });
+      $('#lesson_form').submit(function () {
+          $('.ta').each(function (i) {
+              $(this).attr('name', 'ta' + (i + 1))
+          })
+          $('.res').each(function (i) {
+              $(this).children('div').children('input[type="text"]').attr('name', 'rn' + (i + 1))
+              $(this).children('div').children('input[type="file"]').attr('name', 'r' + (i + 1))
+          })
+      })
+  });
+</script>
+{% endblock script %}

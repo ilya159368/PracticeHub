@@ -1,10 +1,20 @@
 :root {
     --light-gray: #e6e6e6;
     --mid-gray: #586273;
+    --mbgc: rgba(27,59,139,1);
+    --sbgc: rgba(21,37,85, 1);
 }
 
 html, body, .t-b {
     height: 100%;
+}
+
+.btn {
+    background-color: white;
+}
+
+.btn:focus {
+    box-shadow: none !important;
 }
 
 .my-search-form {
@@ -81,19 +91,9 @@ html, body, .t-b {
     color: white!important;
     font-weight: normal!important;
     cursor: default;
-    background: rgba(142,18,254,1);
-    background: linear-gradient(130deg, rgba(142,18,254,1) 0%, rgba(13,58,190,1) 100%);
     font-size: 16px;
-    transition: all 0.5s;
-}
-
-.toggler-inactive {
-    color: rgba(0, 0, 0, 0.5)!important;
-    font-weight: normal!important;
-    cursor: default;
-    background-color: rgba(255, 255, 255, 0);
-    font-size: 14px;
-    transition: all 0.5s;
+    transition: all 1s ease-out;
+    background-color: var(--mbgc)!important;
 }
 
 .search-text::placeholder {
@@ -103,3 +103,44 @@ html, body, .t-b {
 .search-text {
     color: white!important;
 }
+
+.active-circle {
+    background-color: var(--mbgc)!important;
+    outline: white solid .3em!important;
+    outline-offset: -.7em;
+    box-shadow: none !important;
+}
+
+.circle {
+    background-color: var(--mbgc)!important;
+    border: none;
+    box-shadow: none !important;
+}
+
+::-webkit-scrollbar {
+    width: .6rem;
+    border-radius: 1rem;
+}
+
+#resources_window::-webkit-scrollbar-track {
+  width: 1rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    /*background-clip: padding-box;*/
+    border-radius: 1rem;
+}
+
+.mbgc {
+    background-color: var(--mbgc)!important;
+    color: white!important;
+    transition: color .3s ease-out;
+}
+
+button.mbgc:hover, a.mbgc:hover {
+    background-color: var(--sbgc)!important;
+    color: white!important;
+}
+/*27, 59, 193*/
+

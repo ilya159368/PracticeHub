@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Курс: {{ course.name[:20] }}{% endblock title %}
+{% block fullsize_content %}
+<div class="w-100">
+  <img src="{{ url_for('get_file', path=course.img_path) }}" alt="пусто">
+</div>
+{% endblock fullsize_content %}

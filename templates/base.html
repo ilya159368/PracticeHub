@@ -20,9 +20,9 @@
         </button>
       </div>
       {% if current_user.is_authenticated %}
-      <div class="mx-3 order-lg-2 dropdown">
+      <div class="mx-3 order-lg-2 dropdown ms-4">
         <a class="" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" role="button">
-          <img src="https://cdn.discordapp.com/attachments/917080744843706418/945760855902027858/IMG_20220222_221550_060.jpg" alt="пусто" height="40" width="40">
+          <img src="https://media-exp1.licdn.com/dms/image/C560BAQHMnA03XDdf3w/company-logo_200_200/0/1519855918965?e=2159024400&v=beta&t=CrP5Le1mWICRcaxIGNBuajHcHGFPuyNA5C8DI339lSk" alt="пусто" height="40" width="40">
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
           <li><a class="dropdown-item" href="{{ url_for('profile', id=current_user.id) }}">Профиль</a></li>
@@ -32,7 +32,7 @@
         </ul>
       </div>
       {% else %}
-      <div class="d-flex order-lg-2">
+      <div class="d-flex order-lg-2 ms-4">
         <a href="{{ url_for('login') }}" class="btn me-2" style="color: white; border-color: rgba(73, 113, 191, 0.7)">Войти</a>
         <a href="{{ url_for('register') }}" class="btn" style="color: white; border-color: rgba(73, 113, 191, 0.7)">Регистрация</a>
       </div>
@@ -46,7 +46,7 @@
             {% block news_link %}<a class="nav-link" href="#">Новости</a>{% endblock news_link %}
           </li>
         </ul>
-        <form class="d-flex my-search-form" style="margin-right: 10rem">
+        <form class="d-flex my-search-form">
           <input class="form-control search-text" placeholder="Поиск" aria-label="Search" style="background-color: #151F55; border-color: rgba(73, 113, 191, 0.7)">
           <button type="button" class="btn no-focus my-search-icon p-0 m-0" style="background: transparent"><i class="bi bi-search" style="color: white"></i></button>
         </form>
@@ -60,14 +60,18 @@
       {% for category, message in messages %}
       <div role="alert" class="alert {% if category != 'message' %}alert-{{ category }}{% else %}alert-info{% endif %} alert-dismissible mb-1">
         {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
       </div>
     </div>
     {% endfor %}
   {% endif %}
   {% endwith %}
   <!---->
-  <div class="container-fluid pt-5">
+  <div class="container-fluid">
+    {% block fullsize_content %}
+    {% endblock fullsize_content %}
+  </div>
+  <div class="container pt-5" id="content">
     {% block content %}
     {% endblock content %}
   </div>

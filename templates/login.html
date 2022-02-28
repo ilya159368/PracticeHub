@@ -1,34 +1,34 @@
 {% extends 'base.html' %}
 {% block title %}Войти в аккаунт{% endblock title %}
 {% block content %}
-  <div class="w-25 mx-auto mt-3 text-center">
-    <h1>Вход в аккаунт</h1>
-    <form action="" method="post" novalidate class="mt-5">
-      {{ form.hidden_tag() }}
-      <div class="input-group mb-4">
-          {{ form.username.label(class="input-group-text", style="width: 15%;") }}<br>
-          {% if is_post and form.username.errors %}
-            {{ form.username(size=32, class="form-control is-invalid") }}
-            {% for error in form.username.errors %}
-            <div class="invalid-feedback">{{ error }}</div>
-            {% endfor %}
-          {% else %}
-          {{ form.username(size=32, class="form-control") }}
-          {% endif %}
-      </div>
-      <div class="input-group mb-4">
-          {{ form.password.label(class="input-group-text", style="width: 15%;") }}<br>
-          {% if is_post and form.password.errors %}
-            {{ form.password(size=32, class="form-control is-invalid") }}
-            {% for error in form.password.errors %}
-            <div class="invalid-feedback">{{ error }}</div>
-            {% endfor %}
-          {% else %}
-          {{ form.password(size=32, class="form-control") }}
-          {% endif %}
-      </div>
-      <div class="form-check mb-4 text-start">{{ form.remember_me(class="form-check-input me-2") }} {{ form.remember_me.label(class="form-check-label") }}</div>
-      <div class="w-100">{{ form.submit(class="btn btn-primary mx-auto w-50 d-block") }}</div>
-    </form>
-  </div>
+<div class="w-50 mx-auto mt-3 text-center">
+  <h1>Вход в аккаунт</h1>
+  <form action="" method="post" novalidate class="mt-5">
+    {{ form.hidden_tag() }}
+    <div class="input-group mb-4">
+        {{ form.username.label(class="input-group-text", style="width: 15%;") }}<br>
+        {% if is_post and form.username.errors %}
+          {{ form.username(size=32, class="form-control is-invalid") }}
+          {% for error in form.username.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        {% else %}
+        {{ form.username(size=32, class="form-control") }}
+        {% endif %}
+    </div>
+    <div class="input-group mb-4">
+        {{ form.password.label(class="input-group-text", style="width: 15%;") }}<br>
+        {% if is_post and form.password.errors %}
+          {{ form.password(size=32, class="form-control is-invalid") }}
+          {% for error in form.password.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        {% else %}
+        {{ form.password(size=32, class="form-control") }}
+        {% endif %}
+    </div>
+    <div class="form-check mb-4 text-start">{{ form.remember_me(class="form-check-input me-2") }} {{ form.remember_me.label(class="form-check-label") }}</div>
+    <div class="w-100">{{ form.submit(class="btn mbgc mx-auto w-50 d-block") }}</div>
+  </form>
+</div>
 {% endblock content %}

@@ -11,9 +11,8 @@ def load_user(id):
 my_courses = db.Table('tags',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
-    db.Column('completed', db.Integer),
+    db.Column('completed', db.Boolean),
 )
-# todo: completed in course; definition in course
 
 
 class User(UserMixin, db.Model):
@@ -25,6 +24,9 @@ class User(UserMixin, db.Model):
     created_posts = db.relationship('Post', backref='author', lazy='dynamic')
     my_courses = db.relationship('Course', secondary=my_courses, lazy='dynamic',
         backref=db.backref('users', lazy=True))
+    img_path = db.Column(db.String(64))
+    img_uuid = db.Column(db.String(64), index=True)
+    # TODO: date created
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -40,8 +42,11 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    lessons = db.relationship('Lesson', backref='course', lazy='dynamic')
-    description = db.Column(db.Text)
+    lessons = db.relationship('Lesson', backref='course', lazy='dynamic', cascade="all, delete-orphan")
+    desc = db.Column(db.Text, nullable=False)
+    short_desc = db.Column(db.Text, nullable=False)
+    img_path = db.Column(db.String(64))
+    img_uuid = db.Column(db.String(64), index=True)
     # author
     # users
 
@@ -53,7 +58,8 @@ class Lesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    pages = db.relationship('Page', backref='lesson', lazy='dynamic')
+    pages = db.relationship('Page', backref='lesson', lazy='dynamic', cascade="all, delete-orphan")
+    files = db.relationship('LessonFile', backref='lesson', lazy='dynamic', cascade="all, delete-orphan")
     # course
 
     def __repr__(self):
@@ -62,7 +68,6 @@ class Lesson(db.Model):
 
 class Page(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
     text = db.Column(db.Text)
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
     # lesson
@@ -81,3 +86,11 @@ class Post(db.Model):
     def __repr__(self):
         return f'<Post {self.name}> by {self.author.username}'
 
+
+class LessonFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    path = db.Column(db.String(64))
+    uuid = db.Column(db.String(64), index=True)
+    name = db.Column(db.String(64), index=True)
+    lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
+    # lesson

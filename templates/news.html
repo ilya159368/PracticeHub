@@ -1,13 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Новости{% endblock title %}
+{% block catalog_link %}<a class="nav-link active" aria-current="page" href="{{ url_for('news') }}">Новости</a>{% endblock catalog_link %}
 {% block content %}
-<form action="" method="post">
-  {{ form.hidden_tag() }}
-  <img src="" alt="">
-  <div>{{ form.name.label(class="") }}</div>
-  {{ form.name(class="") }}
-  <button class="btn btn-primary" type="submit">
-    submit
-  </button>
-</form>
+  <code>&lt;section&gt;</code>
 {% endblock content %}

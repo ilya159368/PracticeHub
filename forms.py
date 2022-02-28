@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileRequired
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FileField
-from wtforms_components import ColorField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 from models import User
@@ -35,10 +35,6 @@ class RegistrationForm(FlaskForm):
 class CourseDescForm(FlaskForm):
     name = StringField("Название", validators=[DataRequired()])
     desc = TextAreaField("Описание", validators=[DataRequired()])
-    img = FileField("Картинка")
-    save = SubmitField("Сохранить")
-
-
-
-class CreateLesson(FlaskForm):
-    submit = SubmitField('Создать урок')
+    short_desc = TextAreaField("Описание2", validators=[DataRequired()])
+    img = FileField("Картинка", validators=[FileRequired()])
+    submit = SubmitField("Сохранить")
