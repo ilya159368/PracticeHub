@@ -1,4 +1,5 @@
 :root {
+    --xlight-gray: #fafafa;
     --light-gray: #e6e6e6;
     --mid-gray: #586273;
     --mbgc: rgba(27,59,139,1);
@@ -11,6 +12,7 @@ html, body, .t-b {
 
 .btn {
     background-color: white;
+    line-height: normal;
 }
 
 .btn:focus {
@@ -106,14 +108,22 @@ html, body, .t-b {
 
 .active-circle {
     background-color: var(--mbgc)!important;
-    outline: white solid .3em!important;
-    outline-offset: -.7em;
+    outline: white solid .5em!important;
+    outline-offset: -1.3em;
     box-shadow: none !important;
+    border: 0!important;
+}
+
+.c {
+    position: relative;
+    width: 75%!important;
+    height: 0!important;
+    padding: 0 0 75% !important;
 }
 
 .circle {
     background-color: var(--mbgc)!important;
-    border: none;
+    border: 0!important;
     box-shadow: none !important;
 }
 

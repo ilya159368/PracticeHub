@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Создание курса{% endblock title %}
 {% block content %}
-<form class="w-100 mx-auto" action="" method="post" enctype="multipart/form-data">
+<form class="w-100 mx-auto" action="" method="post" enctype="multipart/form-data" novalidate>
   {{ form.hidden_tag() }}
   <div class="row">
     <div class="col-3">
@@ -16,7 +16,8 @@
   </div>
   <div class="row" style="height: 65vh;">
     <div class="col-3 text-center d-flex flex-column justify-content-between">
-      <img class="w-100 d-none" src="#" alt="" id="img">
+      {% if path %}<img class="w-100 mb-3" src="{{ url_for('get_file', path=path) }}" alt="base image" id="base_img">{% endif %}
+      <img class="w-100 d-none" src="" alt="image" id="image">
       {{ form.img(class="w-100 mb-5 d-block form-control", aria_label="select image", type="file") }}
       {{ form.name(class="w-100 form-control mt-1 mt-auto mb-0", placeholder="Название", style="font-size: 1.3rem") }}
     </div>
@@ -40,19 +41,24 @@
 {% block script %}
 <script>
   $(function () {
-      let img = $('#img')
-      function readImg(input) {
+      let img = $('#image')
+      let baseImg = $('#base_img') || false
+      function readImg(s) {
           let reader = new FileReader();
           reader.onload = function(e) {
               img.attr('src', e.target.result);
           }
-          reader.readAsDataURL(input.files[0]);
+          reader.readAsDataURL(s);
       }
       $('input:file').change(function () {
           if ($(this).val()) {
                img.removeClass('d-none').addClass('mb-3');
-               readImg($(this)[0]);
-          } else img.removeClass('mb-3').addClass('d-none');
+               if (baseImg) baseImg.addClass('d-none');
+               readImg($(this)[0].files[0]);
+          } else {
+              if (baseImg) baseImg.removeClass('d-none');
+              img.removeClass('mb-3').addClass('d-none');
+          }
       });
   });
 </script>

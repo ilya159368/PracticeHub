@@ -20,9 +20,7 @@
   <div id="check-div"></div>
   <div class="d-none" id="courses-div">
     {% for c in courses %}
-      <div class="row">
         {{ course_thumbnail(c, teacher=True) }}
-      </div>
     {% endfor %}
     </div>
   </div>
