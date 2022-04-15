@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 import tag_parser
 from app import app, db
 from forms import LoginForm, RegistrationForm, CourseDescForm
-from models import User, load_user, Course, Lesson, Page, LessonFile
+from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck
 from utils import allowed_file
 
 
@@ -85,7 +85,14 @@ def news():
 @login_required
 def teaching():
     courses = Course.query.filter_by(author_id=current_user.id).all()
-    return render_template('teaching.html', courses=courses)
+    checks = []
+    task_checks = TaskCheck.query.all()
+
+    for task in task_checks:
+        if task.page.lesson.course.author_id == current_user.id:
+            checks.append(task)
+
+    return render_template('teaching.html', courses=courses, checks=checks)
 
 
 @app.route('/courses/create', methods=['GET', 'POST'])

@@ -17,7 +17,16 @@
 </div>
 {# content #}
 <div class="mx-auto" style="width: 65%">
-  <div id="check-div"></div>
+  <div id="check-div">
+    {% for c in checks %}
+        <div class="mx-auto w-100 task_check_item">
+          <span style="padding-right: 10px; margin-right: 0.5rem; border-right: solid 1px rgb(210, 210, 210)">{{ c.user.username }}</span>
+          <span style="padding-right: 10px; margin-right: 0.5rem; border-right: solid 1px rgb(210, 210, 210)">{{ c.page.lesson.course.name }}</span>
+          <span style="">{{ c.page.lesson.name }}</span>
+          <span class="float-end">сегодня</span>
+        </div>
+    {% endfor %}
+  </div>
   <div class="d-none" id="courses-div">
     {% for c in courses %}
         {{ course_thumbnail(c, teacher=True) }}
