@@ -64,27 +64,41 @@ html, body, .t-b {
 @media (max-width: 992px) {
     /* profile */
     .mt-profile {
-        margin-top: 2rem!important;
+        margin-top: 2rem !important;
     }
+
     .row-profile {
         margin-bottom: 3rem;
     }
+
     .row-profile > div {
         margin-right: auto;
         margin-left: auto;
     }
+
     .row-profile > div, .row-profile > div > img {
         width: 45%;
     }
+
     .w-profile {
         width: 75%;
     }
+
     /* teaching */
     .teaching {
         margin-right: auto;
     }
 }
-
+@media (max-width: 769px) {
+    .sm-fullsize {
+        width: 100%!important;
+    }
+}
+@media (max-width: 577px) {
+    .sm-column {
+        flex-direction: column;
+    }
+}
 .no-focus:focus {
     box-shadow: none !important;
 }
@@ -94,7 +108,6 @@ html, body, .t-b {
     font-weight: normal!important;
     cursor: default;
     font-size: 16px;
-    transition: all 1s ease-out;
     background-color: var(--mbgc)!important;
 }
 

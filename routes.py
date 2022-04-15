@@ -214,3 +214,16 @@ def lesson(course_id, lesson_id):
     return render_template('lesson.html', lesson=les, contents=contents, course=les.course)
 
 
+@app.route('/test/<int:id>', methods=['GET', 'POST'])
+@login_required
+def test_profile(id):
+    user = User.query.filter(User.id == id).first()
+    created_courses = Course.query.filter_by(author_id=user.id).all()
+
+    can_edit = False
+    if current_user.is_authenticated and user.id == current_user.id:
+        can_edit = True
+
+    return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
+
+
