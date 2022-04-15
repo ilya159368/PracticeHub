@@ -41,5 +41,5 @@ class CourseDescForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    req = StringField('Введите запрос', validators=[DataRequired()])
+    req = StringField('Введите запрос')
     submit = SubmitField('Поиск')

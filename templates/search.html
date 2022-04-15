@@ -3,13 +3,13 @@
 
 {% block fullsize_content %}
 
-<form class="mt-4" action="" method="post">
+<form class="mt-4" action="" method="post" novalidate>
     <div class="row px-0 mx-0">
         <div class="col-md-6 mx-auto" style="">
             <div style="display: flex;">
                 {{ form.hidden_tag() }}
 <!--                <input class="form-control" type="text" placeholder="Введите запрос"><button class="btn btn-primary ms-2">Поиск</button>-->
-            {{ form.req(class="form-control") }} {{ form.submit(class="btn btn-primary ms-2") }}
+                {{ form.req(class="form-control") }} {{ form.submit(class="btn btn-primary ms-2") }}
             </div>
             <hr>
             <div class="d-flex justify-content-center mt-3 float-start">
@@ -30,28 +30,30 @@
 
     <div class="row px-0 mx-auto mt-4">
         <div class="col-md-3">
-            <div style="display: flex; justify-content: center;">
-                <div>
-                    <h5>Начало</h5>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                        <label class="form-check-label" for="flexCheckDefault">Начался</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault1">
-                        <label class="form-check-label" for="flexCheckDefault1">Не начался</label>
-                    </div>
-                </div>
-            </div>
+<!--            <div style="display: flex; justify-content: center;">-->
+<!--                <div>-->
+<!--                    <h5>Начало</h5>-->
+<!--                    <div class="form-check">-->
+<!--                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">-->
+<!--                        <label class="form-check-label" for="flexCheckDefault">Начался</label>-->
+<!--                    </div>-->
+<!--                    <div class="form-check">-->
+<!--                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault1">-->
+<!--                        <label class="form-check-label" for="flexCheckDefault1">Не начался</label>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
 
             <div class="w-50 mx-auto mt-4"> <!-- Поиск по тегам -->
                 <h5>Теги</h5>
                 <input class="form-control" type="text" placeholder="Найти тег" id="tagSearch" onkeyup="search_tag()" style="display: none;">
-                <ul class="list-group mt-3" id="tagsList">
-                    {% for tag in tags %}
-                            <li class="list-group-item" style="border: none; display: {% if loop.index <= 3 %} flex {% else %} none {% endif %};" id="li{{ loop.index }}"><input type="checkbox" class="form-check-input me-1"><p class="my-0">{{ tag }}</p></li>
-                    {% endfor %}
-                </ul>
+                <form class="m-0 p-0" action="" method="post">
+                    <ul class="list-group mt-3" id="tagsList">
+                        {% for tag in tags %}
+                                <li class="list-group-item" style="border: none; display: {% if loop.index <= 3 %} flex {% else %} none {% endif %};" id="li{{ loop.index }}"><input type="checkbox" class="form-check-input me-1" name="{{ tag }}" {% if tag in active_tags %} checked="checked" {% endif %}><p class="my-0">{{ tag }}</p></li>
+                        {% endfor %}
+                    </ul>
+                </form>
                 <a class="" onclick="return new_show({{ tags|length }});" style="text-decoration: underline; color: black; cursor: pointer;" id="showButton">Показать</a>
             </div>
         </div>

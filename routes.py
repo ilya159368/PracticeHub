@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 import tag_parser
 from app import app, db
 from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm
-from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck
+from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, Tag, CoursesTags
 from utils import allowed_file
 
 
@@ -231,19 +231,43 @@ def test_profile(id):
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()
-    if form.validate_on_submit():
+    tags = [key for key, value in request.form.items() if value == 'on']
+
+    if form.validate_on_submit() and form.req.data:
         req = form.req.data
 
         morph = pymorphy3.MorphAnalyzer()
         normal = morph.normal_forms(req)[0]
         courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
                                       Course.desc.contains(normal) | Course.short_desc.contains(normal)
-                                      ).filter(Course.is_published == True).order_by().all()
+                                      ).filter(Course.is_published == True)
+        # reqq = """courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
+        #                               Course.desc.contains(normal) | Course.short_desc.contains(normal)
+        #                               ).filter(Course.is_published == True)"""
+
     else:
-        print('else')
+        courses = Course.query.filter(Course.is_published == True)
+        # reqq = 'courses = Course.query.filter(Course.is_published == True)'
+
+    if tags:
+        courses = courses.filter().all()
+        # cc = "".join([f".filter(Course.tags.contains('{t}'))" for t in tags]) + '.all()'
+        # exec(f'courses = courses{"".join([f".filter({t} in Course.tags)" for t in tags])}.all()')
+        # reqq += cc
+        # print(reqq)
+        # exec(reqq)
+        # exec(f'courses = courses{cc}.all()')
+        # courses = courses.filter().all()
+
+        print([tt.tag for tt in courses[0].tags])
+    else:
         courses = Course.query.all()
+
+    filter_tags = [t.tag for t in Tag.query.all()]
+    # print([[j.tag for j in i.tags] for i in courses])
     print(courses)
-    return render_template('search.html', courses=courses, form=form, tags=[f'{i + 1}-ый тег' for i in range(10)])
+    return render_template('search.html', courses=courses, form=form, tags=filter_tags,
+                           active_tags=tags)
 
 
 @app.route('/favicon.ico', methods=['GET', 'POST'])
