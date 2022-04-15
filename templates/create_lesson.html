@@ -4,12 +4,7 @@
 <form enctype="multipart/form-data" id="lesson_form" method="post">
   <div class="row">
     <div class="col-1">
-      <div class="d-flex justify-content-start px-3 py-3 rounded-pill flex-column align-items-center h-100" style="background-color: var(--light-gray);">
-        <button id="c1" class="rounded-circle btn my-1 active-circle d-block c" style="width: 3em; height: 3em" type="button"></button>
-        <button class="rounded-circle btn mbgc my-1 d-flex justify-content-center align-items-center no-focus" style="width: 3em; height: 3em" type="button" id="add_btn">
-          <i class="bi bi-plus-circle" style="color: #fff; font-size: 1.5em;"></i>
-        </button>
-      </div>
+      {% include 'includes/lesson_pager.html' %}
     </div>
     <div class="col-11 d-flex flex-column">
       <div class="row">
@@ -91,6 +86,7 @@
               toggle($(this));
           });
           check_del_page_btn();
+          if (page_cnt >= 10) $(this).prop('disabled', true)
       })
       $('.active-circle').click(function () {
           toggle($(this));
@@ -173,7 +169,9 @@
           toggle($(c.get(index)));
           page_cnt -= 1;
           check_del_page_btn();
+          if (page_cnt < 10) $('#add_btn').prop('disabled', false)
       });
+
       $('#lesson_form').submit(function () {
           $('.ta').each(function (i) {
               $(this).attr('name', 'ta' + (i + 1))

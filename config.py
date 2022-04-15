@@ -7,7 +7,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = 'static/uploads/'
-    UPLOAD_PATH = os.path.join(basedir, UPLOAD_FOLDER)
     UPLOAD_IMG_SUBFOLDER = 'img/'
     UPLOAD_TXT_SUBFOLDER = 'txt/'
     UPLOAD_VIDEO_SUBFOLDER = 'video/'

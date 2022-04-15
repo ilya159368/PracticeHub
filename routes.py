@@ -8,6 +8,7 @@ import pymorphy3
 
 from werkzeug.utils import secure_filename
 
+import tag_parser
 from app import app, db
 from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm
 from models import User, load_user, Course, Lesson, Page, LessonFile
@@ -21,7 +22,7 @@ def index():
     return render_template('index.html', courses=courses)
 
 
-@app.route('/uploads/<string:path>')
+@app.route('/<string:path>')
 def get_file(path):
     return send_file(path)
 
@@ -97,7 +98,7 @@ def create_course():
         f = form.img.data
         ext = secure_filename(f.filename).split('.')[-1]
         _uuid = uuid4().hex
-        path = os.path.join(app.config['UPLOAD_PATH'], app.config['UPLOAD_IMG_SUBFOLDER'], _uuid + '.' + ext).replace('/', '\\')
+        path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'], _uuid + '.' + ext)
         course.img_path = path
         course.img_uuid = _uuid
         f.save(path)
@@ -110,6 +111,7 @@ def create_course():
 @app.route('/courses/<int:course_id>', methods=['GET', 'POST'])
 # @login_required
 def course(course_id):
+
     course = Course.query.filter_by(id=course_id).first_or_404()
     return render_template('course.html', course=course)
 
@@ -121,10 +123,18 @@ def edit_course(course_id):
     form = CourseDescForm(obj=course)
     if form.validate_on_submit():
         form.populate_obj(course)
-        # TODO: do smth with files!!
+        f = form.img.data
+        ext = secure_filename(f.filename).split('.')[-1]
+        _uuid = uuid4().hex
+        path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'],
+                            _uuid + '.' + ext)
+        os.remove(course.img_path)  # important
+        course.img_path = path
+        course.img_uuid = _uuid
+        f.save(path)
         db.session.commit()
         return redirect(url_for('teaching'))
-    return render_template('create_course.html', form=form)
+    return render_template('create_course.html', form=form, path=course.img_path)
 
 
 @app.route('/courses/<int:course_id>/lessons', methods=['GET'])
@@ -168,7 +178,7 @@ def create_lesson(course_id):
                 ...
             _uuid = uuid4().hex
             ext = filename.split('.')[-1]
-            path = os.path.join(app.config['UPLOAD_PATH'], app.config['UPLOAD_IMG_SUBFOLDER'], _uuid + '.' + ext).replace('/', '\\')
+            path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'], _uuid + '.' + ext)
             fv.save(path)
             lesson_file = LessonFile(path=path, uuid=_uuid, name=user_filename, lesson=lesson)
             db.session.add(lesson_file)
@@ -176,7 +186,7 @@ def create_lesson(course_id):
         for k, v in data.items():
             if not k.startswith('ta'):
                 continue
-            text = escape(v)
+            text = v
             page = Page(text=text, lesson=lesson)
             db.session.add(page)
         db.session.commit()
@@ -188,7 +198,14 @@ def create_lesson(course_id):
 @app.route('/courses/<int:course_id>/lessons/<int:lesson_id>', methods=['GET', 'POST'])
 @login_required
 def lesson(course_id, lesson_id):
-    lesson = Lesson.query.filter_by(id=course_id).first()
+    les = Lesson.query.filter_by(id=lesson_id).first()
+    img_convert = {}
+    contents = []
+    for f in les.files:
+        img_convert[f.name] = url_for('get_file', path=f.path)
+    for p in les.pages:
+        contents.append(tag_parser.parse(p.text, img_convert))
+    return render_template('lesson.html', lesson=les, contents=contents, course=les.course)
 
 
 @app.route('/test/<int:id>', methods=['GET', 'POST'])

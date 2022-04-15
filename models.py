@@ -22,8 +22,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     created_courses = db.relationship('Course', backref='author', lazy='dynamic')
     created_posts = db.relationship('Post', backref='author', lazy='dynamic')
-    my_courses = db.relationship('Course', secondary=my_courses, lazy='dynamic',
-        backref=db.backref('users', lazy=True))
+    my_courses = db.relationship('Course', secondary=my_courses, lazy='dynamic', backref=db.backref('users', lazy=True))
     img_path = db.Column(db.String(64))
     img_uuid = db.Column(db.String(64), index=True)
     # TODO: date created
