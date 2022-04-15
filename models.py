@@ -25,6 +25,8 @@ class User(UserMixin, db.Model):
     my_courses = db.relationship('Course', secondary=my_courses, lazy='dynamic', backref=db.backref('users', lazy=True))
     img_path = db.Column(db.String(64))
     img_uuid = db.Column(db.String(64), index=True)
+
+    task_check = db.relationship("TaskCheck", backref="user")
     # TODO: date created
 
     def set_password(self, password):
@@ -72,6 +74,8 @@ class Page(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text)
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
+    task_check = db.relationship("TaskCheck", backref="page")
+
     # lesson
 
     def __repr__(self):
@@ -97,3 +101,14 @@ class LessonFile(db.Model):
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
 
     # lesson
+
+
+class TaskCheck(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    page_id = db.Column(db.Integer, db.ForeignKey("page.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    # author_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    file = db.Column(db.String(64))
+
+    def __repr__(self):
+        return f"<TaskCheck {self.id} page {self.page_id}>"

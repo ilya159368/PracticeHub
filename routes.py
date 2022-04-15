@@ -221,31 +221,3 @@ def test_profile(id):
     return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
 
 
-@app.route('/test/<int:id>', methods=['GET', 'POST'])
-def test_profile(id):
-    user = User.query.filter(User.id == id).first()
-    created_courses = Course.query.filter(Course.author_id == user.id).all()
-
-    can_edit = False
-    if current_user.__class__.__name__ != 'AnonymousUserMixin' and user.id == current_user.id:
-        can_edit = True
-
-    return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
-
-
-@app.route('/search', methods=['GET', 'POST'])
-def search():
-    form = SearchForm()
-    if form.validate_on_submit():
-        req = form.req.data
-
-        morph = pymorphy3.MorphAnalyzer()
-        normal = morph.normal_forms(req)[0]
-        courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
-                                      Course.desc.contains(normal) | Course.short_desc.contains(normal)
-                                      ).filter(Course.is_published == True).order_by().all()
-    else:
-        print('else')
-        courses = Course.query.all()
-    print(courses)
-    return render_template('search.html', courses=courses, form=form, tags=[f'{i + 1}-ый тег' for i in range(10)])
