@@ -1,6 +1,7 @@
 from app import db, login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
 
 
 @login.user_loader
@@ -45,7 +46,7 @@ class Course(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     lessons = db.relationship('Lesson', backref='course', lazy='dynamic', cascade="all, delete-orphan")
     desc = db.Column(db.Text, nullable=False)
-    rating = db.Column(db.Integer)
+    rating = db.Column(db.Integer, default=0)
     short_desc = db.Column(db.Text, nullable=False)
     img_path = db.Column(db.String(64))
     img_uuid = db.Column(db.String(64), index=True)
@@ -109,6 +110,7 @@ class TaskCheck(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     # author_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     file = db.Column(db.String(64))
+    date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
 
     def __repr__(self):
         return f"<TaskCheck {self.id} page {self.page_id}>"

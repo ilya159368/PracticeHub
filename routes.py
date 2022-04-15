@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 import tag_parser
 from app import app, db
 from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm
-from models import User, load_user, Course, Lesson, Page, LessonFile
+from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck
 from utils import allowed_file
 
 
@@ -86,7 +86,14 @@ def news():
 @login_required
 def teaching():
     courses = Course.query.filter_by(author_id=current_user.id).all()
-    return render_template('teaching.html', courses=courses)
+    checks = []
+    task_checks = TaskCheck.query.all()
+
+    for task in task_checks:
+        if task.page.lesson.course.author_id == current_user.id:
+            checks.append(task)
+
+    return render_template('teaching.html', courses=courses, checks=checks)
 
 
 @app.route('/courses/create', methods=['GET', 'POST'])
@@ -220,4 +227,26 @@ def test_profile(id):
 
     return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
 
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    form = SearchForm()
+    if form.validate_on_submit():
+        req = form.req.data
+
+        morph = pymorphy3.MorphAnalyzer()
+        normal = morph.normal_forms(req)[0]
+        courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
+                                      Course.desc.contains(normal) | Course.short_desc.contains(normal)
+                                      ).filter(Course.is_published == True).order_by().all()
+    else:
+        print('else')
+        courses = Course.query.all()
+    print(courses)
+    return render_template('search.html', courses=courses, form=form, tags=[f'{i + 1}-ый тег' for i in range(10)])
+
+
+@app.route('/favicon.ico', methods=['GET', 'POST'])
+def favicon():
+    return get_file('static/images/favicon.ico')
 

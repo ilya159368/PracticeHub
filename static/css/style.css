@@ -140,7 +140,7 @@ html, body, .t-b {
     width: 100%; /* Ширина слоя */
     background: rgb(17,26,58);
     background: linear-gradient(95deg, rgba(17,26,58,1) 0%, rgba(27,59,139,1) 100%);
-    margin-bottom: 0!important;
+    margin-top: 1rem;
 }
 
 .active-circle {
@@ -190,3 +190,7 @@ button.mbgc:hover, a.mbgc:hover {
     color: white!important;
 }
 /*27, 59, 193*/
+
+.profile-link::active {
+    background-color: aqua!important;
+}
