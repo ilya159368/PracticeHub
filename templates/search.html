@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% from "includes/course_thumbnail.html" import course_thumbnail %}
+
+{% block fullsize_content %}
+
+<form class="mt-4" action="" method="post">
+    <div class="row px-0 mx-0">
+        <div class="col-md-6 mx-auto" style="">
+            <div style="display: flex;">
+                {{ form.hidden_tag() }}
+<!--                <input class="form-control" type="text" placeholder="Введите запрос"><button class="btn btn-primary ms-2">Поиск</button>-->
+            {{ form.req(class="form-control") }} {{ form.submit(class="btn btn-primary ms-2") }}
+            </div>
+            <hr>
+            <div class="d-flex justify-content-center mt-3 float-start">
+                <a class="ms-0" onclick="return rating_sorter();">Рейтинг </a><i class="bi bi-bar-chart-fill" style="transform: rotate(270deg) scale(1, -1); display: none;" id="ratingIcon"></i>
+                <a class="ms-3" onclick="return sorter();">Алфавит </a><i class="bi bi-bar-chart-fill" style="transform: rotate(270deg) scale(1, -1); display: none;" id="alphIcon"></i>
+<!--            <div class="dropdown">-->
+<!--                <button class="btn btn-light dropdown-toggle px-2 border" type="button" id="menubtn" data-bs-toggle="dropdown" aria-expanded="false">Рейтинг</button>-->
+
+<!--                <ul class="dropdown-menu" aria-labelledby="menubtn">-->
+<!--                    <li><a href="" class="dropdown-item">По возрастанию</a></li>-->
+<!--                    <li><a href="" class="dropdown-item">По убыванию</a></li>-->
+<!--                </ul>-->
+<!--            </div>-->
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row px-0 mx-auto mt-4">
+        <div class="col-md-3">
+            <div style="display: flex; justify-content: center;">
+                <div>
+                    <h5>Начало</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">Начался</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault1">
+                        <label class="form-check-label" for="flexCheckDefault1">Не начался</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-50 mx-auto mt-4"> <!-- Поиск по тегам -->
+                <h5>Теги</h5>
+                <input class="form-control" type="text" placeholder="Найти тег" id="tagSearch" onkeyup="search_tag()" style="display: none;">
+                <ul class="list-group mt-3" id="tagsList">
+                    {% for tag in tags %}
+                            <li class="list-group-item" style="border: none; display: {% if loop.index <= 3 %} flex {% else %} none {% endif %};" id="li{{ loop.index }}"><input type="checkbox" class="form-check-input me-1"><p class="my-0">{{ tag }}</p></li>
+                    {% endfor %}
+                </ul>
+                <a class="" onclick="return new_show({{ tags|length }});" style="text-decoration: underline; color: black; cursor: pointer;" id="showButton">Показать</a>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            {% if courses|length == 0 %}
+                <div style="align-items: center">
+                    <h3>Тут ничего нет</h3>
+                    <p class="text-muted">Похоже, что ни один из курсов не соответствует вашему запросу</p>
+                  </div>
+            {% else %}
+                <ul style="list-style: none; padding: 0" id="coursesList">
+                {% for c in courses %}
+                    <li id="course{{ loop.index }}"> {{ course_thumbnail(c) }} </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block script %}
+<script language="JavaScript">
+    function search_tag() {
+        let search = document.getElementById('tagSearch').value;
+        let lst = document.getElementById('tagsList');
+        let tags = lst.getElementsByTagName('li');
+
+        for (let i = 0; i < tags.length; i++) {
+            let now_tag = tags[i].getElementsByTagName('p')[0];
+            if ((now_tag.textContent || now_tag.innerText).toUpperCase().indexOf(search.toUpperCase()) > -1) {
+                tags[i].style.display = "flex";
+            }
+            else {
+                tags[i].style.display = "none";
+            }
+        }
+    };
+
+    function new_show(n) {
+        var btn = document.getElementById('showButton');
+
+        if (btn.textContent == 'Показать') {
+             document.getElementById('tagSearch').style.display = 'block'
+             btn.textContent = 'Скрыть'
+
+             for (let i = 4; i <= n; i++) {
+                document.getElementById('li' + i.toString(10)).style.display = 'flex'
+            }
+        }
+
+        else {
+            btn.textContent = 'Показать'
+            document.getElementById('tagSearch').style.display = 'none'
+            document.getElementById('tagSearch').value = ''
+            search_tag()
+
+            for (let i = 1; i <= n; i++) {
+                let element = document.getElementById('li' + i.toString(10))
+                if (i < 4) {
+                    element.style.display = 'flex'
+                }
+                else {
+                    element.style.display = 'none'
+                }
+            }
+        }
+    };
+
+    function comparator(a, b) {  // функция сравнения для сортировки по алфавиту
+        var hsA = a.getElementsByTagName('h4');
+        var hsB = b.getElementsByTagName('h4');
+
+        var resA, resB;
+        for (let i = 0; i < hsA.length; i++) {
+            if (hsA[i].classList.contains('card-title')) {
+                resA = hsA[i];
+            }
+            if (hsB[i].classList.contains('card-title')) {
+                resB = hsB[i];
+            }
+        }
+
+        if (resA.textContent > resB.textContent) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
+        return 0;
+    };
+
+
+    function sorter() {  // функция сортировки
+        var ul = document.getElementById('coursesList');
+        var new_ul = ul.cloneNode(false);
+
+        var lst = [];
+        var tags = ul.getElementsByTagName('li');
+
+        for (let i = 1; i <= tags.length; i++) {
+            let element = document.getElementById('course' + i.toString(10))
+            if (element.style.display != 'none') {
+                lst.push(element)
+            }
+        }
+
+        lst.sort(comparator);
+
+        // блок по работе с иконкой
+        let icon = document.getElementById('alphIcon');
+
+        if (icon.style.display == 'none') {
+            icon.style.display = '';
+            icon.style.transform = 'rotate(90deg)'
+
+            document.getElementById('ratingIcon').style.display = 'none'
+        }
+
+        else if (icon.style.transform == 'rotate(90deg)') {
+            icon.style.transform = 'rotate(270deg) scale(1, -1)'
+            lst.reverse()
+        }
+
+        else {
+            icon.style.transform = 'rotate(90deg)'
+        }
+
+        for (let i = 0; i < lst.length; i++) { // добавление элементов в html
+            new_ul.appendChild(lst[i]);
+        }
+
+        ul.parentNode.replaceChild(new_ul, ul);
+    };
+
+    function rating_comparator(a, b) {
+        var likesA = Number(a.getElementsByClassName('text-muted')[0].textContent);
+        var likesB = Number(b.getElementsByClassName('text-muted')[0].textContent);
+
+        if (likesA > likesB) {
+            return 1
+        }
+
+        else {
+            return -1;
+        }
+        return 0;
+    };
+
+    function rating_sorter() {
+        var ul = document.getElementById('coursesList');
+        var new_ul = ul.cloneNode(false);
+
+        var lst = [];
+        var tags = ul.getElementsByTagName('li');
+
+        for (let i = 1; i <= tags.length; i++) {
+            let element = document.getElementById('course' + i.toString(10))
+            if (element.style.display != 'none') {
+                lst.push(element)
+            }
+        }
+        lst.sort(rating_comparator);
+
+        let icon = document.getElementById('ratingIcon');
+
+        if (icon.style.display == 'none') {
+            icon.style.display = '';
+            icon.style.transform = 'rotate(90deg)'
+
+            document.getElementById('alphIcon').style.display = 'none'
+        }
+
+        else if (icon.style.transform == 'rotate(90deg)') {
+            icon.style.transform = 'rotate(270deg) scale(1, -1)'
+            lst.reverse()
+        }
+
+        else {
+            icon.style.transform = 'rotate(90deg)'
+        }
+
+        for (let i = 0; i < lst.length; i++) { // добавление элементов в html
+            new_ul.appendChild(lst[i]);
+        }
+
+        ul.parentNode.replaceChild(new_ul, ul);
+    }
+
+</script>
+{% endblock %}
+

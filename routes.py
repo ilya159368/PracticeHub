@@ -4,11 +4,12 @@ from flask import render_template, redirect, url_for, flash, request, send_file,
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from uuid import uuid4
+import pymorphy3
 
 from werkzeug.utils import secure_filename
 
 from app import app, db
-from forms import LoginForm, RegistrationForm, CourseDescForm
+from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm
 from models import User, load_user, Course, Lesson, Page, LessonFile
 from utils import allowed_file
 
@@ -107,10 +108,10 @@ def create_course():
 
 
 @app.route('/courses/<int:course_id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def course(course_id):
     course = Course.query.filter_by(id=course_id).first_or_404()
-    return render_template('course.html')
+    return render_template('course.html', course=course)
 
 
 @app.route('/courses/<int:course_id>/edit', methods=['GET', 'POST'])
@@ -190,3 +191,31 @@ def lesson(course_id, lesson_id):
     lesson = Lesson.query.filter_by(id=course_id).first()
 
 
+@app.route('/test/<int:id>', methods=['GET', 'POST'])
+def test_profile(id):
+    user = User.query.filter(User.id == id).first()
+    created_courses = Course.query.filter(Course.author_id == user.id).all()
+
+    can_edit = False
+    if current_user.__class__.__name__ != 'AnonymousUserMixin' and user.id == current_user.id:
+        can_edit = True
+
+    return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    form = SearchForm()
+    if form.validate_on_submit():
+        req = form.req.data
+
+        morph = pymorphy3.MorphAnalyzer()
+        normal = morph.normal_forms(req)[0]
+        courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
+                                      Course.desc.contains(normal) | Course.short_desc.contains(normal)
+                                      ).filter(Course.is_published == True).order_by().all()
+    else:
+        print('else')
+        courses = Course.query.all()
+    print(courses)
+    return render_template('search.html', courses=courses, form=form, tags=[f'{i + 1}-ый тег' for i in range(10)])

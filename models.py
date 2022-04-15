@@ -44,9 +44,12 @@ class Course(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     lessons = db.relationship('Lesson', backref='course', lazy='dynamic', cascade="all, delete-orphan")
     desc = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer)
     short_desc = db.Column(db.Text, nullable=False)
     img_path = db.Column(db.String(64))
     img_uuid = db.Column(db.String(64), index=True)
+
+    is_published = db.Column(db.Boolean, default=False)
     # author
     # users
 
@@ -93,4 +96,5 @@ class LessonFile(db.Model):
     uuid = db.Column(db.String(64), index=True)
     name = db.Column(db.String(64), index=True)
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
+
     # lesson
