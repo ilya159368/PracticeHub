@@ -1,11 +1,12 @@
 import os
 from os.path import join
-from flask import render_template, redirect, url_for, flash, request, send_file, escape
+from flask import render_template, redirect, url_for, flash, request, send_file, escape, abort
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from uuid import uuid4
 
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException
 
 import tag_parser
 from app import app, db
@@ -117,7 +118,6 @@ def create_course():
 @app.route('/courses/<int:course_id>', methods=['GET', 'POST'])
 @login_required
 def course(course_id):
-
     course = Course.query.filter_by(id=course_id).first_or_404()
     return render_template('course.html', course=course)
 
@@ -227,3 +227,54 @@ def test_profile(id):
     return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
 
 
+@app.route("/api")
+def api():
+    current_api = [
+        {"title": "/api/get_username", "desc": "Used for getting user name", "params": [("id", "user id")],
+         "return": ("name", "user name"), "ex": "https://practicehub.org/api/get_username?id=1"},
+        {"title": "/api/get_course_icon", "desc": "Used for getting course icon (avatar) by id", "params": [("id", "course id")],
+         "return": ("img", "course icon"), "ex": "https://practicehub.org/api/get_course_icon?id=1"},
+        {"title": "/api/get_course_name", "desc": "Used for getting course name by id",
+         "params": [("id", "course id")],
+         "return": ("name", "course name"), "ex": "https://practicehub.org/api/get_course_name?id=1"},
+        {"title": "/api/get_course_id", "desc": "Used for getting course id by name",
+         "params": [("name", "course name")],
+         "return": ("id", "course id"), "ex": "https://practicehub.org/api/get_course_id?name=Mega%20python"}
+    ]
+
+    return render_template("api.html", apis=current_api)
+
+
+@app.route("/api/get_username")
+def get_name():
+    account_id = request.args["id"]
+    user = User.query.filter(User.id == account_id).first()
+    return user.username
+
+
+@app.route("/api/get_course_icon")
+def get_course_icon():
+    course_id = request.args["id"]
+    course = Course.query.filter_by(id=course_id).first()
+    return send_file(course.img_path)
+
+
+@app.route("/api/get_course_name")
+def get_course_name():
+    course_id = request.args["id"]
+    course = Course.query.filter_by(id=course_id).first()
+    return course.name
+
+
+@app.route("/api/get_course_id")
+def get_course_id():
+    course_name = request.args["name"]
+    course = Course.query.filter_by(name=course_name).first()
+    if not course:
+        abort(404)
+    return course.id
+
+
+@app.errorhandler(HTTPException)
+def handle_exception(e):
+    return render_template("error.html", errorname=e.name, cat_img=f"https://http.cat/{e.code}")

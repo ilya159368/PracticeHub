@@ -71,12 +71,13 @@
     {% block fullsize_content %}
     {% endblock fullsize_content %}
   </div>
-  <div class="container pt-5" id="content">
+  <div class="container pt-5" id="content" style="min-height: 85.7vh">
     {% block content %}
     {% endblock content %}
   </div>
+
   <!---->
-  <footer class="footer d-flex flex-wrap justify-content-between align-items-center py-4" style="box-shadow: 0 0 20px rgba(32, 45, 160, 0.5)">
+  <footer class="footer d-flex flex-wrap justify-content-between align-items-center py-4">
     <div class="col-md-4 d-flex align-items-center">
       <a href="/" class="me-2 mb-md-0 text-muted text-decoration-none lh-1">
         <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
@@ -84,14 +85,11 @@
       <span style="color: rgb(160, 160, 160)">© 2022 Practice Hub, Inc</span>
     </div>
 
-    <div class="col-md-4">
-      <a style="color: rgb(255, 255, 255)">Контакты</a><br>
-      <a style="color: rgb(255, 255, 255)">О проэкте</a>
+    <div class="col-md-6">
+      <a style="color: rgb(50, 50, 50)">Контакты</a><br>
+      <a href='{{ url_for("api") }}' style="color: rgb(50, 50, 50)">API</a><br>
+      <a style="color: rgb(50, 50, 50)">О проекте</a>
     </div>
-
-    <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-
-    </ul>
   </footer>
   {# scripts #}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>

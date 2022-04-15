@@ -7,7 +7,7 @@
 }
 
 html, body, .t-b {
-    height: 100%;
+    min-height: 100%;
 }
 
 .btn {
@@ -135,12 +135,15 @@ html, body, .t-b {
 }
 
 .footer {
-    position: fixed; /* Фиксированное положение */
-    left: 0; bottom: 0; /* Левый нижний угол */
+    position: relative;
+    left: 0px;
+    bottom: 0px;
     width: 100%; /* Ширина слоя */
-    background: rgb(17,26,58);
-    background: linear-gradient(95deg, rgba(17,26,58,1) 0%, rgba(27,59,139,1) 100%);
-    margin-bottom: 0!important;
+    background-color: rgb(240, 240, 240);
+    padding-left: 25rem;
+    padding-right: 25rem;
+    margin-top: 2rem;
+    text-decoration: none;
 }
 
 .active-circle {
