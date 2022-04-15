@@ -4,14 +4,15 @@ from flask import render_template, redirect, url_for, flash, request, send_file,
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from uuid import uuid4
+import pymorphy3
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
 
 import tag_parser
 from app import app, db
-from forms import LoginForm, RegistrationForm, CourseDescForm
-from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck
+from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm
+from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, Tag, CoursesTags
 from utils import allowed_file
 
 
@@ -118,6 +119,7 @@ def create_course():
 @app.route('/courses/<int:course_id>', methods=['GET', 'POST'])
 @login_required
 def course(course_id):
+
     course = Course.query.filter_by(id=course_id).first_or_404()
     return render_template('course.html', course=course)
 
@@ -257,6 +259,52 @@ def get_course_icon():
     course_id = request.args["id"]
     course = Course.query.filter_by(id=course_id).first()
     return send_file(course.img_path)
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    form = SearchForm()
+    tags = [key for key, value in request.form.items() if value == 'on']
+
+    if form.validate_on_submit() and form.req.data:
+        req = form.req.data
+
+        morph = pymorphy3.MorphAnalyzer()
+        normal = morph.normal_forms(req)[0]
+        courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
+                                      Course.desc.contains(normal) | Course.short_desc.contains(normal)
+                                      ).filter(Course.is_published == True)
+        # reqq = """courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
+        #                               Course.desc.contains(normal) | Course.short_desc.contains(normal)
+        #                               ).filter(Course.is_published == True)"""
+
+    else:
+        courses = Course.query.filter(Course.is_published == True)
+        # reqq = 'courses = Course.query.filter(Course.is_published == True)'
+
+    if tags:
+        courses = courses.filter().all()
+        # cc = "".join([f".filter(Course.tags.contains('{t}'))" for t in tags]) + '.all()'
+        # exec(f'courses = courses{"".join([f".filter({t} in Course.tags)" for t in tags])}.all()')
+        # reqq += cc
+        # print(reqq)
+        # exec(reqq)
+        # exec(f'courses = courses{cc}.all()')
+        # courses = courses.filter().all()
+
+        print([tt.tag for tt in courses[0].tags])
+    else:
+        courses = Course.query.all()
+
+    filter_tags = [t.tag for t in Tag.query.all()]
+    # print([[j.tag for j in i.tags] for i in courses])
+    print(courses)
+    return render_template('search.html', courses=courses, form=form, tags=filter_tags,
+                           active_tags=tags)
+
+
+@app.route('/favicon.ico', methods=['GET', 'POST'])
+def favicon():
+    return get_file('static/images/favicon.ico')
 
 
 @app.route("/api/get_course_name")

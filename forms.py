@@ -38,3 +38,8 @@ class CourseDescForm(FlaskForm):
     short_desc = TextAreaField("Описание2", validators=[DataRequired()])
     img = FileField("Картинка", validators=[FileRequired()])
     submit = SubmitField("Сохранить")
+
+
+class SearchForm(FlaskForm):
+    req = StringField('Введите запрос')
+    submit = SubmitField('Поиск')

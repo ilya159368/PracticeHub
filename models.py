@@ -1,6 +1,7 @@
 from app import db, login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
 
 
 @login.user_loader
@@ -8,7 +9,7 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-my_courses = db.Table('tags',
+my_courses = db.Table('my_courses',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
     db.Column('completed', db.Boolean),
@@ -39,15 +40,36 @@ class User(UserMixin, db.Model):
         return f'<User {self.username}>'
 
 
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    tag = db.Column(db.String)
+
+    def __repr__(self):
+        return f'{self.tag}'
+
+
+class CoursesTags(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'))
+
+
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     lessons = db.relationship('Lesson', backref='course', lazy='dynamic', cascade="all, delete-orphan")
     desc = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer, default=0)
+
     short_desc = db.Column(db.Text, nullable=False)
     img_path = db.Column(db.String(64))
     img_uuid = db.Column(db.String(64), index=True)
+
+    is_published = db.Column(db.Boolean, default=False)
+
+    tags = db.relationship('Tag', secondary=CoursesTags.__table__, backref='Course')
+
     # author
     # users
 
@@ -96,6 +118,7 @@ class LessonFile(db.Model):
     uuid = db.Column(db.String(64), index=True)
     name = db.Column(db.String(64), index=True)
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
+
     # lesson
 
 
@@ -105,6 +128,9 @@ class TaskCheck(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     # author_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     file = db.Column(db.String(64))
+    date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
 
     def __repr__(self):
         return f"<TaskCheck {self.id} page {self.page_id}>"
+
+
