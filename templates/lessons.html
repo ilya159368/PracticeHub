@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1 class="text-center">{{ course.name }}</h1>
-<a href="{{ url_for('create_lesson', course_id=course.id) }}" class="btn mbgc w-25 mx-auto d-block mt-4 mb-5">Создать урок</a>
+{% if teacher %}<a href="{{ url_for('create_lesson', course_id=course.id) }}" class="btn mbgc w-25 mx-auto d-block mt-4 mb-5">Создать урок</a>{% endif %}
 <div class="mx-auto d-flex flex-column d-block" style="width: 60%" id="lessons_div">
   {% for lesson in lessons|reverse %}
     <a href="{{ url_for('lesson', course_id=course.id, lesson_id=lesson.id) }}" class="border rounded-3 my-2 shadow px-5 py-4 text-body" style="background-color: #f7f7f5; text-decoration: none; cursor: pointer">

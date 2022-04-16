@@ -1,6 +1,7 @@
 import os
 from os.path import join
-from flask import render_template, redirect, url_for, flash, request, send_file, escape, abort
+from flask import render_template, redirect, url_for, flash, request, send_file, escape, abort, \
+    make_response
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from uuid import uuid4
@@ -21,6 +22,11 @@ from utils import allowed_file
 def index():
     courses = Course.query.limit(10).all()  # TODO: add order by likes(?..)
     return render_template('index.html', courses=courses)
+
+
+@app.route('/favicon.ico', methods=['GET', 'POST'])
+def favicon():
+    return get_file('static/images/favicon.ico')
 
 
 @app.route('/<string:path>')
@@ -119,9 +125,21 @@ def create_course():
 @app.route('/courses/<int:course_id>', methods=['GET', 'POST'])
 @login_required
 def course(course_id):
-
     course = Course.query.filter_by(id=course_id).first_or_404()
-    return render_template('course.html', course=course)
+    if request.method == 'POST':
+        course.users.append(current_user)
+        db.session.add(course)
+        db.session.commit()
+        print(course.users)
+        flash('Вы успешно поступили на курс', 'success')
+        return redirect(url_for('lessons', course_id=course_id))
+    started = True if current_user in course.users else False
+    resp = make_response(render_template('course.html', course=course, started=started))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    resp.headers['Cache-Control'] = 'public, max-age=0'
+    return resp
 
 
 @app.route('/courses/<int:course_id>/edit', methods=['GET', 'POST'])
@@ -152,9 +170,9 @@ def lessons(course_id):
     lessons = Lesson.query.filter_by(course_id=course.id).all()
 
     if User.query.filter_by(username=current_user.username).first().id == course.author_id:
-        return render_template('lessons.html', course=course, lessons=lessons)
+        return render_template('lessons.html', course=course, lessons=lessons, teacher=True)
     else:
-        return 'страница уроков для ученика'
+        return render_template('lessons.html', course=course, lessons=lessons)
 
 
 @app.route('/courses/<int:course_id>/lessons/create', methods=['GET', 'POST'])
@@ -191,12 +209,16 @@ def create_lesson(course_id):
             lesson_file = LessonFile(path=path, uuid=_uuid, name=user_filename, lesson=lesson)
             db.session.add(lesson_file)
         # pages
+        pages = []
         for k, v in data.items():
-            if not k.startswith('ta'):
-                continue
-            text = v
-            page = Page(text=text, lesson=lesson)
-            db.session.add(page)
+            if k.startswith('ta'):
+                text = v
+                page = Page(text=text, lesson=lesson)
+                pages.append(page)
+            if k.startswith('ch'):
+                page = pages[int(k[2:]) - 1]
+                page.add_task = True if v == 'on' else False
+                db.session.add(page)
         db.session.commit()
         return redirect(url_for('lessons', course_id=course_id))
     # get
@@ -300,11 +322,6 @@ def search():
     print(courses)
     return render_template('search.html', courses=courses, form=form, tags=filter_tags,
                            active_tags=tags)
-
-
-@app.route('/favicon.ico', methods=['GET', 'POST'])
-def favicon():
-    return get_file('static/images/favicon.ico')
 
 
 @app.route("/api/get_course_name")

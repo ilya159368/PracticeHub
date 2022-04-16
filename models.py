@@ -23,7 +23,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     created_courses = db.relationship('Course', backref='author', lazy='dynamic')
     created_posts = db.relationship('Post', backref='author', lazy='dynamic')
-    my_courses = db.relationship('Course', secondary=my_courses, lazy='dynamic', backref=db.backref('users', lazy=True))
+    my_courses = db.relationship('Course', secondary=my_courses, lazy='dynamic', backref=db.backref('users'))
     img_path = db.Column(db.String(64))
     img_uuid = db.Column(db.String(64), index=True)
 
@@ -68,7 +68,7 @@ class Course(db.Model):
 
     is_published = db.Column(db.Boolean, default=False)
 
-    tags = db.relationship('Tag', secondary=CoursesTags.__table__, backref='Course')
+    tags = db.relationship('Tag', secondary=CoursesTags.__table__, backref='course')
 
     # author
     # users
@@ -93,6 +93,7 @@ class Page(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text)
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
+    add_task = db.Column(db.Boolean, default=False)
     task_check = db.relationship("TaskCheck", backref="page")
 
     # lesson

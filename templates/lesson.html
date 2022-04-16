@@ -2,54 +2,62 @@
 {% block title %}{{ lesson.name }}{% endblock title %}
 {% block content %}
   <form enctype="multipart/form-data" id="lesson_form" method="post">
-  <div class="row">
-    <div class="col-1">
-      <div class="d-flex justify-content-start mx-auto rounded-pill flex-column align-items-center h-100 w-625" style="background-color: var(--light-gray);">
-        {% for i in contents %}
-          <button id="c{{ loop.index }}" class="rounded-circle btn my-2 d-block c {% if loop.index == 1 %}active-circle{% else %}circle{% endif %}" type="button"></button>
-        {% endfor %}
-      </div>
-    </div>
-    <div class="col-11 d-flex flex-column">
-      <div class="row">
-        <span class="h2 px-3 py-2 mx-auto rounded text-center" style="background-color: var(--xlight-gray); border: #e6e6e6 0.1rem solid; width: 60%; overflow-wrap: break-word;">{{ course.name }} / {{ lesson.name }}</span>
-      </div>
-      <div class="row mt-5 flex-grow-1">
-        {% for c in contents %}
-        <div class="col-12">
-          <div id="ta{{ loop.index }}" class="h-100 d-block ta {% if not loop.first %}d-none{% endif %} rounded p-3" style="min-height: 20rem; background-color: var(--xlight-gray); border: #e6e6e6 0.1rem solid">{{ c|safe }}</div>
+    <div class="row">
+      <div class="col-1">
+        <div
+            class="d-flex justify-content-start mx-auto rounded-pill flex-column align-items-center h-100 w-625"
+            style="background-color: var(--light-gray);">
+          {% for i in contents %}
+            <button id="c{{ loop.index }}"
+                    class="rounded-circle btn my-2 d-block c {% if loop.index == 1 %}active-circle{% else %}circle{% endif %}"
+                    type="button"></button>
+          {% endfor %}
         </div>
-        {% endfor %}
+      </div>
+      <div class="col-11 d-flex flex-column">
+        <div class="row">
+          <span class="h2 px-3 py-2 mx-auto rounded text-center"
+                style="background-color: var(--xlight-gray); border: #e6e6e6 0.1rem solid; width: 60%; overflow-wrap: break-word;">{{ course.name }} / {{ lesson.name }}</span>
+        </div>
+        <div class="row mt-5 flex-grow-1">
+          {% for c in contents %}
+            <div class="col-12">
+              <div id="ta{{ loop.index }}"
+                   class="h-100 d-block ta {% if not loop.first %}d-none{% endif %} rounded p-3"
+                   style="min-height: 20rem; background-color: var(--xlight-gray); border: #e6e6e6 0.1rem solid">{{ c|safe }}</div>
+            </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
-  </div>
-</form>
+  </form>
 {% endblock content %}
 {% block script %}
-<script>
-  $(function () {
-      let activeC = $('#c1')
-      let activeTA = $('#ta1')
-      $('.circle').click(function () {
-          toggle($(this));
-      });
+  <script>
+      $(function () {
+          let activeC = $('#c1')
+          let activeTA = $('#ta1')
+          $('.circle').click(function () {
+              toggle($(this));
+          });
 
-      function toggle (_new) {
-          {#alert(activeC.attr('id'))#}
-          activeC.removeClass('active-circle');
-          activeC.addClass('circle');
-          activeC = _new;
-          {#alert(activeC.attr('id'))#}
-          activeC.addClass('active-circle');
-          activeC.removeClass('circle');
-          activeTA.addClass('d-none');
-          {#alert(_new.attr('id'))#}
-          activeTA = $(`#${_new.attr('id').replace('c', 'ta')}`);
-          activeTA.removeClass('d-none');
-      }
-      $('.active-circle').click(function () {
-          toggle($(this));
-      })
-  });
-</script>
+          function toggle(_new) {
+              {#alert(activeC.attr('id'))#}
+              activeC.removeClass('active-circle');
+              activeC.addClass('circle');
+              activeC = _new;
+              {#alert(activeC.attr('id'))#}
+              activeC.addClass('active-circle');
+              activeC.removeClass('circle');
+              activeTA.addClass('d-none');
+              {#alert(_new.attr('id'))#}
+              activeTA = $(`#${_new.attr('id').replace('c', 'ta')}`);
+              activeTA.removeClass('d-none');
+          }
+
+          $('.active-circle').click(function () {
+              toggle($(this));
+          })
+      });
+  </script>
 {% endblock script %}

@@ -30,7 +30,13 @@
         <div class="col-md-4 me-auto" style="width: auto; margin-right: 20vw;">
             <div class="row">
                 <!--<h2>Цена</h2>-->
-                <button class="btn btn-success">Поступить на курс</button>
+                {% if started %}
+                <a class="btn btn-success" href="{{ url_for('lessons', course_id=course.id) }}">перейти к урокам</a>
+                {% else %}
+                <form action="" method="post">
+                  <button class="btn btn-success w-100">Поступить на курс</button>
+                </form>
+                {% endif %}
             </div>
 
             <h5 class="my-5">Курс начинается 123.123.123</h5>
