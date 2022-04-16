@@ -89,22 +89,16 @@ def news():
     return render_template('news.html')
 
 
-@app.route('/teaching', methods=['GET', 'POST'])
+@app.route('/teaching', methods=['GET'])
 @login_required
 def teaching():
     courses = Course.query.filter_by(author_id=current_user.id).all()
     checks = []
-    task_checks = TaskCheck.query.filter(TaskCheck.status.is_(None)).all()
+    task_checks = TaskCheck.query.all()
+
     for task in task_checks:
         if task.page.lesson.course.author_id == current_user.id:
             checks.append(task)
-    if request.method == 'POST':
-        data = request.form
-        task_check = checks[int(data['index'])]
-        task_check.status = 1 if int(data['choice']) else 0
-        db.session.add(task_check)
-        db.session.commit()
-        return 'ok'
 
     return render_template('teaching.html', courses=courses, checks=checks)
 

@@ -10,4 +10,5 @@ class Config:
     UPLOAD_IMG_SUBFOLDER = 'img/'
     UPLOAD_TXT_SUBFOLDER = 'txt/'
     UPLOAD_VIDEO_SUBFOLDER = 'video/'
+    UPLOAD_HW_SUBFOLDER = 'homeworks/'
     ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp4'}

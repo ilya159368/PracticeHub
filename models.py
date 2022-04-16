@@ -126,10 +126,14 @@ class LessonFile(db.Model):
 class TaskCheck(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     page_id = db.Column(db.Integer, db.ForeignKey("page.id"))
+    page_index = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    # author_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     file = db.Column(db.String(64))
-    date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
+    date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    status = db.Column(db.Integer)
+
+    # page
+    # user
 
     def __repr__(self):
         return f"<TaskCheck {self.id} page {self.page_id}>"

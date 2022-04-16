@@ -22,8 +22,12 @@
         <div class="mx-auto w-100 task_check_item">
           <span style="padding-right: 10px; margin-right: 0.5rem; border-right: solid 1px rgb(210, 210, 210)">{{ c.user.username }}</span>
           <span style="padding-right: 10px; margin-right: 0.5rem; border-right: solid 1px rgb(210, 210, 210)">{{ c.page.lesson.course.name }}</span>
-          <span style="">{{ c.page.lesson.name }}</span>
-          <span class="float-end">сегодня</span>
+          <a href="{{ url_for('lesson', course_id=c.page.lesson.course.id, lesson_id=c.page.lesson.id) }}"  style="padding-right: 10px; text-decoration: none; border-right: solid 1px rgb(210, 210, 210)">{{ c.page.lesson.name }}</a>
+          <span style="padding-right: 10px; margin-right: 0.5rem;">Страница №{{ c.page_index + 1}}</span>
+          <a href="{{ url_for('get_file', path=c.file) }}" download="homework"><i class="bi bi-file-earmark-arrow-down float-end" style="margin-left: 1rem"></i></a>
+          <span class="float-end">{{ c.date.strftime('%Y.%m.%d %H:%M') }}</span>
+          <i class="bi bi-check-circle text-success float-end me-3 btn_yes" style="cursor: pointer" id="{{ loop.index0 }}"></i>
+          <i class="bi bi-x-circle text-danger float-end me-3 btn_no" style="cursor: pointer" id="{{ loop.index0 }}"></i>
         </div>
     {% endfor %}
   </div>
@@ -58,6 +62,24 @@
             check_div.addClass('d-none');
             courses_div.removeClass('d-none');
             create.removeClass('d-none');
+        });
+
+        $('.btn_yes, .btn_no').click(function () {
+            let choice = +($(this).hasClass('btn_yes'))
+            let btn = $(this)
+            let data = {
+                index: $(this).attr('id'),
+                choice: choice
+            }
+            function success() {
+                btn.parent().remove();
+            }
+            $.ajax({
+               type: "POST",
+               url: '{{ url_for('teaching') }}',
+               data: data,
+               success: success
+             });
         });
     });
 </script>
