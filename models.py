@@ -58,7 +58,7 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    lessons = db.relationship('Lesson', backref='course', lazy='dynamic', cascade="all, delete-orphan")
+    lessons = db.relationship('Lesson', backref='course', lazy='select', cascade="all, delete-orphan")
     desc = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, default=0)
 
@@ -81,7 +81,7 @@ class Lesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    pages = db.relationship('Page', backref='lesson', lazy='dynamic', cascade="all, delete-orphan")
+    pages = db.relationship('Page', backref='lesson', lazy='select', cascade="all, delete-orphan")
     files = db.relationship('LessonFile', backref='lesson', lazy='dynamic', cascade="all, delete-orphan")
     # course
 

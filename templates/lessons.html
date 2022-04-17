@@ -7,6 +7,7 @@
   {% for lesson in lessons|reverse %}
     <a href="{{ url_for('lesson', course_id=course.id, lesson_id=lesson.id) }}" class="border rounded-3 my-2 shadow px-5 py-4 text-body" style="background-color: #f7f7f5; text-decoration: none; cursor: pointer">
       <span class="h2 mb-0">{{ lesson.name }}</span>
+      <span class="h4 mb-0 float-end">Страниц: {{ lesson.pages|length }}</span>
     </a>
   {% endfor %}
 </div>

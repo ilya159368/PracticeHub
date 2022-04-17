@@ -6,13 +6,12 @@
         <div class="col-md-6" style="margin-left: 20vw;">
             <h2 class="display-5 fw-bold" style="color: white;">{{ course.name }}</h2>
             <p class="fs-4 text-break mb-0 me-5 d-block" style="color: white;">
-                hdsaksdkjdsjfnvjknskdnvksndjnajdhfouhasoifnweiuwbfiusadfnsdkfnasudbfasibdakskjdnkjsndfnsdkjfn123
-                {# {{ course.short_desc }} #}</p>
+                 {{ course.short_desc }}
+            </p>
         </div>
 
         <div class="col-md-4 me-auto align-self-end fs-5" style="color: white; width: auto; margin-right: 20vw;">
-            123 <i class="bi bi-people-fill" style="color: white;"> учащихся</i><br>
-            123 <i class="bi bi-heart" style="color: white;"> оценили курс</i>
+            {{ course.users|length }} <i class="bi bi-people-fill" style="color: white;"> учащихся</i><br>
         </div>
     </div>
 </div>
@@ -20,18 +19,14 @@
     <div class="row w-100">
         <div class="col-md-6" style="margin-left: 20vw;">
             <h4>О курсе</h4>
-            <p class="fs-6">{{ course.description }}</p>
-            <h4>Для кого этот курс</h4>
-            <p class="fs-6 text-break me-5 d-block">
-                jnkjvnskjdnvksndkjvnsjdnvsndvskjndfkjnsdnfakjdnfkansdkfjandsakjsndkjansdkjnasddafnkjdsnfkasdfiba981y39821ubjdsbjasbdfaiusdfuasd
-            </p>
+            <p class="fs-6">{{ course.desc }}</p>
         </div>
 
         <div class="col-md-4 me-auto" style="width: auto; margin-right: 20vw;">
             <div class="row">
                 <!--<h2>Цена</h2>-->
                 {% if started %}
-                <a class="btn btn-success" href="{{ url_for('lessons', course_id=course.id) }}">перейти к урокам</a>
+                <a class="btn btn-success" href="{{ url_for('lessons', course_id=course.id) }}">Перейти к урокам</a>
                 {% else %}
                 <form action="" method="post">
                   <button class="btn btn-success w-100">Поступить на курс</button>
@@ -39,13 +34,11 @@
                 {% endif %}
             </div>
 
-            <h5 class="my-5">Курс начинается 123.123.123</h5>
-
-            <div class="row py-3 px-2" style="background-color: #ededed;">
+            <div class="row py-3 px-2 mt-4" style="background-color: #ededed;">
                 <p class="fs-6 fw-bold">В курс входят</p>
                 <div class="d-flex flex-column">
-                    <span class="my-2"><span class="fw-bold fs-6">123</span> уроков</span>
-                    <span class="my-2"><span class="fw-bold fs-6">123</span> видео</span>
+                    <span class="my-2">Уроков: <span class="fw-bold fs-6">{{ course_cnt }}</span></span>
+                    <span class="my-2">Домашних заданий: <span class="fw-bold fs-6">{{ hw_cnt }}</span></span>
                 </div>
             </div>
         </div>

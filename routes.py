@@ -80,7 +80,9 @@ def register():
 def profile(id):
     user = User.query.filter_by(id=id).first()
 
-    return render_template('profile.html', user=user)
+    courses = len(Course.query.filter_by(author_id=id).all())
+
+    return render_template('profile.html', user=user, courses_cnt=courses)
 
 
 @app.route('/news', methods=['GET', 'POST'])
@@ -142,9 +144,10 @@ def course(course_id):
         print(course.users)
         flash('Вы успешно поступили на курс', 'success')
         return redirect(url_for('lessons', course_id=course_id))
+    hw_cnt = len(db.engine.execute(f"select p.add_task from page as p inner join lesson l on p.lesson_id = l.id where (p.add_task = 1) and (l.course_id = {course_id})").all())
+    course_cnt = len(course.lessons)
     started = True if current_user in course.users else False
-    resp = make_response(render_template('course.html', course=course, started=started))
-    return resp
+    return render_template('course.html', course=course, course_cnt=course_cnt, hw_cnt=hw_cnt, started=started)
 
 
 @app.route('/courses/<int:course_id>/edit', methods=['GET', 'POST'])
