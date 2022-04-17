@@ -10,7 +10,7 @@
           {% for i in contents %}
             <button id="c{{ loop.index }}"
                     class="rounded-circle btn my-2 d-block c {% if loop.index == 1 %}active-circle{% else %}circle{% endif %}"
-                    type="button"></button>
+                    type="button" style="background-color: {{ circle_colors[loop.index0] }}!important"></button>
           {% endfor %}
         </div>
       </div>
@@ -23,9 +23,9 @@
             <div class="col-12">
               {% for c in contents %}
                 <div id="ta{{ loop.index }}"
-                    class="h-100 d-block ta {% if not loop.first %}d-none{% endif %} rounded p-3"
+                    class="d-block ta {% if not loop.first %}d-none{% endif %} rounded p-3"
                     style="background-color: var(--xlight-gray); border: #e6e6e6 0.1rem solid">{{ c|safe }}
-                    {% if pages[loop.index0].add_task %}
+                    {% if draw_hw[loop.index0] %}
                       <br><label class="h4 mt-5">Домашнее задание</label>
                       <input type="file" name="hw{{ loop.index0 }}" style="width: 25%" class="form-control">
                     {% endif %}

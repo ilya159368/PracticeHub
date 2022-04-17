@@ -18,18 +18,21 @@
 {# content #}
 <div class="mx-auto" style="width: 65%">
   <div id="check-div">
+    <form action="" method="post">
     {% for c in checks %}
-        <div class="mx-auto w-100 task_check_item">
+        <div class="mx-auto w-100 task_check_item py-2 px-4">
+          <input type="hidden" name="{{ loop.index0 }}" id="hidden_input">
           <span style="padding-right: 10px; margin-right: 0.5rem; border-right: solid 1px rgb(210, 210, 210)">{{ c.user.username }}</span>
           <span style="padding-right: 10px; margin-right: 0.5rem; border-right: solid 1px rgb(210, 210, 210)">{{ c.page.lesson.course.name }}</span>
           <a href="{{ url_for('lesson', course_id=c.page.lesson.course.id, lesson_id=c.page.lesson.id) }}"  style="padding-right: 10px; text-decoration: none; border-right: solid 1px rgb(210, 210, 210)">{{ c.page.lesson.name }}</a>
           <span style="padding-right: 10px; margin-right: 0.5rem;">Страница №{{ c.page_index + 1}}</span>
           <a href="{{ url_for('get_file', path=c.file) }}" download="homework"><i class="bi bi-file-earmark-arrow-down float-end" style="margin-left: 1rem"></i></a>
           <span class="float-end">{{ c.date.strftime('%Y.%m.%d %H:%M') }}</span>
-          <i class="bi bi-check-circle text-success float-end me-3 btn_yes" style="cursor: pointer" id="{{ loop.index0 }}"></i>
-          <i class="bi bi-x-circle text-danger float-end me-3 btn_no" style="cursor: pointer" id="{{ loop.index0 }}"></i>
+          <button class="btn py-1 px-0 float-end me-4 btn_yes" type="submit"><i class="bi bi-check-circle text-success"></i></button>
+          <button class="btn py-1 px-0 float-end me-2 btn_no" type="submit"><i class="bi bi-x-circle text-danger"></i></button>
         </div>
     {% endfor %}
+    </form>
   </div>
   <div class="d-none" id="courses-div">
     {% for c in courses %}
@@ -64,22 +67,28 @@
             create.removeClass('d-none');
         });
 
-        $('.btn_yes, .btn_no').click(function () {
-            let choice = +($(this).hasClass('btn_yes'))
-            let btn = $(this)
-            let data = {
-                index: $(this).attr('id'),
-                choice: choice
-            }
-            function success() {
-                btn.parent().remove();
-            }
-            $.ajax({
-               type: "POST",
-               url: '{{ url_for('teaching') }}',
-               data: data,
-               success: success
-             });
+        // $('.btn_yes, .btn_no').click(function () {
+        //     let choice = +($(this).hasClass('btn_yes'))
+        //     let btn = $(this)
+        //     let data = {
+        //         index: $(this).attr('id'),
+        //         choice: choice
+        //     }
+        //     function success() {
+        //         btn.parent().remove();
+        //     }
+        //     $.ajax({
+        //        type: "POST",
+        //        url: '{{ url_for('teaching') }}',
+        //        data: data,
+        //        success: success
+        //      });
+        // });
+        $('.btn_yes').click(function () {
+            $('#hidden_input').attr('value', 1)
+        });
+        $('.btn_no').click(function () {
+            $('#hidden_input').attr('value', 0)
         });
     });
 </script>

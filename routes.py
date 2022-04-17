@@ -98,13 +98,16 @@ def teaching():
     for task in task_checks:
         if task.page.lesson.course.author_id == current_user.id:
             checks.append(task)
+
     if request.method == 'POST':
         data = request.form
-        task_check = checks[int(data['index'])]
-        task_check.status = 1 if int(data['choice']) else 0
-        db.session.add(task_check)
-        db.session.commit()
-        return 'ok'
+        for k, v in data.items():
+            if v:
+                task_check = checks[int(k)]
+                checks.pop(int(k))
+                task_check.status = 1 if int(v) else 0
+                db.session.add(task_check)
+                db.session.commit()
 
     return render_template('teaching.html', courses=courses, checks=checks)
 
@@ -141,10 +144,6 @@ def course(course_id):
         return redirect(url_for('lessons', course_id=course_id))
     started = True if current_user in course.users else False
     resp = make_response(render_template('course.html', course=course, started=started))
-    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    resp.headers["Pragma"] = "no-cache"
-    resp.headers["Expires"] = "0"
-    resp.headers['Cache-Control'] = 'public, max-age=0'
     return resp
 
 
@@ -241,7 +240,7 @@ def lesson(course_id, lesson_id):
             index = int(k[2:])
             filename = v.filename
             if not filename:
-                raise ValueError('empty file | null name')
+                continue
             if not allowed_file(filename):
                 # TODO: do smth
                 ...
@@ -255,15 +254,27 @@ def lesson(course_id, lesson_id):
         flash('Домашние задания успешно сохранены', 'success')
     img_convert = {}
     contents = []
+    colors = ["#6c757d" for _ in les.pages]
     should_show_homework = False
+    draw_hw = [False for _ in les.pages]
     for f in les.files:
         img_convert[f.name] = url_for('get_file', path=f.path)
-    for p in les.pages:
+    for k, p in enumerate(les.pages):
         contents.append(tag_parser.parse(p.text, img_convert))
+        checks = TaskCheck.query.filter_by(page_id=p.id).all()
         if p.add_task:
-            should_show_homework = True
+            if len(checks) == 0 or checks[-1].status != 1:
+                should_show_homework = True
+                draw_hw[k] = True
+            if len(checks) != 0 and checks[-1].status == 1:
+                colors[k] = "#198754"
+            elif len(checks) != 0 and checks[-1].status == 0:
+                colors[k] = "#dc3545"
+        else:
+            colors[k] = "var(--mbgc)"
 
-    return render_template('lesson.html', lesson=les, contents=contents, course=les.course, pages=les.pages, show_hw=should_show_homework)
+
+    return render_template('lesson.html', lesson=les, contents=contents, course=les.course, pages=les.pages, show_hw=should_show_homework, circle_colors=colors, draw_hw=draw_hw)
 
 
 @app.route('/test/<int:id>', methods=['GET', 'POST'])
