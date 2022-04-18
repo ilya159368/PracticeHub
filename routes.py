@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
 
 import tag_parser
-from app import app, db
+from main import app, db
 from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm
 from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, Tag, CoursesTags
 from utils import allowed_file
@@ -346,7 +346,8 @@ def search():
         # reqq = 'courses = Course.query.filter(Course.is_published == True)'
 
     if tags:
-        courses = courses.filter().all()
+        for tag in tags:
+            courses = courses.filter(Course.tags.any(Tag.tag == tag))
         # cc = "".join([f".filter(Course.tags.contains('{t}'))" for t in tags]) + '.all()'
         # exec(f'courses = courses{"".join([f".filter({t} in Course.tags)" for t in tags])}.all()')
         # reqq += cc
