@@ -12,15 +12,15 @@ from werkzeug.exceptions import HTTPException
 
 import tag_parser
 from main import app, db
-from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm
-from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, Tag, CoursesTags
+from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm, EditMainInfo, EditPassword
+from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, Tag
 from utils import allowed_file
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    courses = Course.query.limit(10).all()  # TODO: add order by likes(?..)
+    courses = Course.query.filter(Course.is_published == True).limit(10).all()  # TODO: add order by likes(?..)
     return render_template('index.html', courses=courses)
 
 
@@ -144,7 +144,8 @@ def course(course_id):
         print(course.users)
         flash('Вы успешно поступили на курс', 'success')
         return redirect(url_for('lessons', course_id=course_id))
-    hw_cnt = len(db.engine.execute(f"select p.add_task from page as p inner join lesson l on p.lesson_id = l.id where (p.add_task = 1) and (l.course_id = {course_id})").all())
+    hw_cnt = len(db.engine.execute(
+        f"select p.add_task from page as p inner join lesson l on p.lesson_id = l.id where (p.add_task = 1) and (l.course_id = {course_id})").all())
     course_cnt = len(course.lessons)
     started = True if current_user in course.users else False
     return render_template('course.html', course=course, course_cnt=course_cnt, hw_cnt=hw_cnt, started=started)
@@ -276,21 +277,46 @@ def lesson(course_id, lesson_id):
         else:
             colors[k] = "var(--mbgc)"
 
+    return render_template('lesson.html', lesson=les, contents=contents, course=les.course, pages=les.pages,
+                           show_hw=should_show_homework, circle_colors=colors, draw_hw=draw_hw)
 
-    return render_template('lesson.html', lesson=les, contents=contents, course=les.course, pages=les.pages, show_hw=should_show_homework, circle_colors=colors, draw_hw=draw_hw)
 
-
-@app.route('/test/<int:id>', methods=['GET', 'POST'])
+@app.route('/test', methods=['GET', 'POST'])
 @login_required
-def test_profile(id):
-    user = User.query.filter(User.id == id).first()
-    created_courses = Course.query.filter_by(author_id=user.id).all()
+def test_profile():
+    messages = []
 
-    can_edit = False
-    if current_user.is_authenticated and user.id == current_user.id:
-        can_edit = True
+    user = User.query.filter(User.id == current_user.id).first()
 
-    return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
+    main_inf = EditMainInfo()
+    pwd = EditPassword()
+
+    if request.method == 'GET':
+        main_inf.username.data = user.username
+        main_inf.email.data = user.email
+
+    if main_inf.validate_on_submit():
+        user.username = main_inf.username.data
+        user.email = main_inf.email.data
+
+        db.session.add(user)
+        db.session.commit()
+
+    else:
+        main_inf.username.data = user.username
+        main_inf.email.data = user.email
+
+    if pwd.validate_on_submit():
+        if user.check_password(pwd.old_password.data):
+            user.set_password(pwd.password1.data)
+            db.session.add(user)
+            db.session.commit()
+    else:
+        main_inf.username.data = user.username
+        main_inf.email.data = user.email
+
+    return render_template('edit_profile.html', main_inf=main_inf, password_form=pwd)
+    # return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
 
 
 @app.route("/api")
@@ -298,7 +324,8 @@ def api():
     current_api = [
         {"title": "/api/get_username", "desc": "Used for getting user name", "params": [("id", "user id")],
          "return": ("name", "user name"), "ex": "https://practicehub.org/api/get_username?id=1"},
-        {"title": "/api/get_course_icon", "desc": "Used for getting course icon (avatar) by id", "params": [("id", "course id")],
+        {"title": "/api/get_course_icon", "desc": "Used for getting course icon (avatar) by id",
+         "params": [("id", "course id")],
          "return": ("img", "course icon"), "ex": "https://practicehub.org/api/get_course_icon?id=1"},
         {"title": "/api/get_course_name", "desc": "Used for getting course name by id",
          "params": [("id", "course id")],
@@ -324,45 +351,35 @@ def get_course_icon():
     course = Course.query.filter_by(id=course_id).first()
     return send_file(course.img_path)
 
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()
-    tags = [key for key, value in request.form.items() if value == 'on']
 
-    if form.validate_on_submit() and form.req.data:
+    if request.method == 'POST' and 'searchInput' in request.form.keys():
+        form.req.data = request.form['searchInput']
+
+    tags = [key for key, value in request.form.items() if value == 'on']
+    if form.req.data:
         req = form.req.data
 
         morph = pymorphy3.MorphAnalyzer()
         normal = morph.normal_forms(req)[0]
         courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
-                                      Course.desc.contains(normal) | Course.short_desc.contains(normal)
-                                      ).filter(Course.is_published == True)
-        # reqq = """courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
-        #                               Course.desc.contains(normal) | Course.short_desc.contains(normal)
-        #                               ).filter(Course.is_published == True)"""
-
+                                      Course.desc.contains(normal) | Course.short_desc.contains(normal) |
+                                      Course.desc.contains(req) | Course.short_desc.contains(req) |
+                                      Course.name.contains(req) | Course.name.contains(req)
+                                      ).filter(Course.is_published == True).order_by(Course.rating.desc())
     else:
         courses = Course.query.filter(Course.is_published == True)
-        # reqq = 'courses = Course.query.filter(Course.is_published == True)'
 
     if tags:
-        for tag in tags:
-            courses = courses.filter(Course.tags.any(Tag.tag == tag))
-        # cc = "".join([f".filter(Course.tags.contains('{t}'))" for t in tags]) + '.all()'
-        # exec(f'courses = courses{"".join([f".filter({t} in Course.tags)" for t in tags])}.all()')
-        # reqq += cc
-        # print(reqq)
-        # exec(reqq)
-        # exec(f'courses = courses{cc}.all()')
-        # courses = courses.filter().all()
+        for t in tags:
+            courses = courses.filter(Course.tags.any(Tag.tag == t))
 
-        print([tt.tag for tt in courses[0].tags])
-    else:
-        courses = Course.query.all()
-
+    courses = courses.all()
     filter_tags = [t.tag for t in Tag.query.all()]
-    # print([[j.tag for j in i.tags] for i in courses])
-    print(courses)
+
     return render_template('search.html', courses=courses, form=form, tags=filter_tags,
                            active_tags=tags)
 

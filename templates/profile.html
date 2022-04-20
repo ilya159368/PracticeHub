@@ -1,38 +1,97 @@
 {% extends 'base.html' %}
 {% block title %}Профиль{% endblock title %}
 {% block content %}
-<div class="w-profile mx-auto">
+<div class="mx-auto" style="width: 60%;">
   <h1 class="text-center">Профиль</h1>
   <div class="row mt-profile">
-    <div class="col-lg-10 col-xs-12 px-0 order-2 order-lg-1">
-      <div class="row h5 mb-3">
-        <span>
-          Имя пользователя: {{ user.username }}&nbsp;<a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
-        </span>
-      </div>
-      <div class="row h5 mb-4">
-        <span>
-          Email: {{ user.email }}&nbsp;<a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
-        </span>
-      </div>
-      <div class="row h6">
-        <span class="mb-1">Создано курсов: {{ courses_cnt }}</span>
+
+    <div class="col-lg-2 col-xs-12 row-profile order-1">
+        <div class="row">
+          <img src="https://cdn.discordapp.com/attachments/917080744843706418/945760855902027858/IMG_20220222_221550_060.jpg" alt="пусто" class="border border-dark p-0" style="width: 100%">
+        </div>
+        <div class="row text-center">
+          <a href="#" class="primary-link px-0">Изменить</a>
+        </div>
+    </div>
+
+    <div class="col-lg-1"></div>
+
+    <div class="col-lg-7 col-xs-12 px-0 order-2" style="align-content: center;">
+      <div class="mx-auto">
+        <div class="row h5 mb-3">
+          <span>
+            Имя пользователя: {{ user.username }}&nbsp;<a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
+          </span>
+        </div>
+        <div class="row h5 mb-4">
+          <span>
+            Email: {{ user.email }}&nbsp;<a href="#" class="primary-link"><i class="bi bi-pencil-square"></i></a>
+          </span>
+        </div>
+        <div class="row h6">
+          <span class="mb-1">Создано курсов: {{ courses_cnt }}</span>
+        </div>
       </div>
     </div>
-    <div class="col-lg-2 col-xs-12 order-1 order-lg-2 row-profile">
-      <div class="row">
-        <img src="https://cdn.discordapp.com/attachments/917080744843706418/945760855902027858/IMG_20220222_221550_060.jpg" alt="пусто" class="border border-dark p-0" style="width: 100%">
-      </div>
-      <div class="row text-center">
-        <a href="#" class="primary-link px-0">Изменить</a>
-      </div>
-    </div>
+
   </div>
   <div class="row justify-content-between mt-5">
     <a href="#" class="btn btn-outline-primary w-45">Изменить пароль</a>
     <a href="#" class="btn btn-outline-primary w-45">Удалить аккаунт</a>
   </div>
 </div>
+
+<div class="row">
+      <div class="col">
+        <div class="mt-4 d-flex justify-content-center"> <!-- buttons -->
+          <ul class="nav sm-column" id="buttons" role="tablist">
+            <li class="nav-item active px-3 profile-link border"
+                style="border-width: 0.1rem; border-radius: 50rem 0 0 50rem;">
+              <a href="#buttons-tabs-1" class="fs-3 nav-link active" style="color: black;"
+                 aria-controls="buttons-tabs-1" role="tab" data-bs-toggle="tab">Обучение</a></li>
+
+            <li class="nav-item px-3 profile-link border"
+                style="border-width: 0.1rem; border-radius: 0rem 50rem 50rem 0rem;">
+              <a href="#buttons-tabs-3" class="fs-3 nav-link" style="color: black;"
+                 aria-controls="buttons-tabs-3" role="tab" data-bs-toggle="tab">Курсы</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+  <div class="w-75 mx-auto sm-fullsize">
+    <div class="tab-content">
+      <div class="tab-pane active" id="buttons-tabs-1" role="tabpanel">
+        <div class="mt-4 mx-auto" style="align-content: center; align-items: center; width: fit-content">
+          <div style="align-items: center">
+            <h3>Тут ничего нет</h3>
+            <p class="text-muted">Похоже, что пользователь не прошёл ни одного курса</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="buttons-tabs-3" role="tabpanel">
+        {% if courses|length == 0 %}
+          <div class="mt-4 mx-auto" style="align-content: center; align-items: center; width: fit-content">
+            <div style="align-items: center">
+              <h3>Тут ничего нет</h3>
+              <p class="text-muted">Похоже, что пользователь не опубликовал ни одного курса</p>
+            </div>
+          </div>
+
+        {% else %}
+          {% for c in courses %}
+            <div class="col-6 mx-auto">
+              {{ course_thumbnail(c) }}
+            </div>
+          {% endfor %}
+
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
 {% endblock content %}
 {% block script %}
 <script>
