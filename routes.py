@@ -296,6 +296,8 @@ def lesson(course_id, lesson_id):
         else:
             colors[k] = "var(--mbgc)"
 
+    return render_template('lesson.html', lesson=les, contents=contents, course=les.course, pages=les.pages,
+                           show_hw=should_show_homework, circle_colors=colors, draw_hw=draw_hw)
 
 
 @app.route('/test', methods=['GET', 'POST'])
