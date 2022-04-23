@@ -1,4 +1,3 @@
-import json
 import os
 from os.path import join
 from flask import render_template, redirect, url_for, flash, request, send_file, escape, abort, \
@@ -12,9 +11,9 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
 
 import tag_parser
-from app import app, db
-from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm
-from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, Tag, CoursesTags
+from main import app, db
+from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm, EditMainInfo, EditPassword
+from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, Tag
 from utils import allowed_file
 
 
@@ -298,20 +297,43 @@ def lesson(course_id, lesson_id):
             colors[k] = "var(--mbgc)"
 
 
-    return render_template('lesson.html', lesson=les, contents=contents, course=les.course, pages=les.pages, show_hw=should_show_homework, circle_colors=colors, draw_hw=draw_hw)
 
-
-@app.route('/test/<int:id>', methods=['GET', 'POST'])
+@app.route('/test', methods=['GET', 'POST'])
 @login_required
-def test_profile(id):
-    user = User.query.filter(User.id == id).first()
-    created_courses = Course.query.filter_by(author_id=user.id).all()
+def test_profile():
+    messages = []
 
-    can_edit = False
-    if current_user.is_authenticated and user.id == current_user.id:
-        can_edit = True
+    user = User.query.filter(User.id == current_user.id).first()
 
-    return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
+    main_inf = EditMainInfo()
+    pwd = EditPassword()
+
+    if request.method == 'GET':
+        main_inf.username.data = user.username
+        main_inf.email.data = user.email
+
+    if main_inf.validate_on_submit():
+        user.username = main_inf.username.data
+        user.email = main_inf.email.data
+
+        db.session.add(user)
+        db.session.commit()
+
+    else:
+        main_inf.username.data = user.username
+        main_inf.email.data = user.email
+
+    if pwd.validate_on_submit():
+        if user.check_password(pwd.old_password.data):
+            user.set_password(pwd.password1.data)
+            db.session.add(user)
+            db.session.commit()
+    else:
+        main_inf.username.data = user.username
+        main_inf.email.data = user.email
+
+    return render_template('edit_profile.html', main_inf=main_inf, password_form=pwd)
+    # return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
 
 
 @app.route("/docs/api")
@@ -408,41 +430,31 @@ def get_user_info():
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()
-    tags = [key for key, value in request.form.items() if value == 'on']
 
-    if form.validate_on_submit() and form.req.data:
+    if request.method == 'POST' and 'searchInput' in request.form.keys():
+        form.req.data = request.form['searchInput']
+
+    tags = [key for key, value in request.form.items() if value == 'on']
+    if form.req.data:
         req = form.req.data
 
         morph = pymorphy3.MorphAnalyzer()
         normal = morph.normal_forms(req)[0]
         courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
-                                      Course.desc.contains(normal) | Course.short_desc.contains(normal)
-                                      ).filter(Course.is_published == True)
-        # reqq = """courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
-        #                               Course.desc.contains(normal) | Course.short_desc.contains(normal)
-        #                               ).filter(Course.is_published == True)"""
-
+                                      Course.desc.contains(normal) | Course.short_desc.contains(normal) |
+                                      Course.desc.contains(req) | Course.short_desc.contains(req) |
+                                      Course.name.contains(req) | Course.name.contains(req)
+                                      ).filter(Course.is_published == True).order_by(Course.rating.desc())
     else:
         courses = Course.query.filter(Course.is_published == True)
-        # reqq = 'courses = Course.query.filter(Course.is_published == True)'
 
     if tags:
-        courses = courses.filter().all()
-        # cc = "".join([f".filter(Course.tags.contains('{t}'))" for t in tags]) + '.all()'
-        # exec(f'courses = courses{"".join([f".filter({t} in Course.tags)" for t in tags])}.all()')
-        # reqq += cc
-        # print(reqq)
-        # exec(reqq)
-        # exec(f'courses = courses{cc}.all()')
-        # courses = courses.filter().all()
+        for t in tags:
+            courses = courses.filter(Course.tags.any(Tag.tag == t))
 
-        print([tt.tag for tt in courses[0].tags])
-    else:
-        courses = Course.query.all()
-
+    courses = courses.all()
     filter_tags = [t.tag for t in Tag.query.all()]
-    # print([[j.tag for j in i.tags] for i in courses])
-    print(courses)
+
     return render_template('search.html', courses=courses, form=form, tags=filter_tags,
                            active_tags=tags)
 

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="text-align: center">Редактирование информации профиля</h2>
+{% for e in form.errors %}
+
+{% endfor %}
+
+<div class="container-fluid" style="margin-top: 5rem;">
+    <div class="row mx-auto">
+        <div class="col-md-3">
+            <div class="d-flex flex-column text-center">
+                <button onclick="return swap();" class="border py-2 rounded" id="mainInfo" style="background-color: rgba(27,59,139,1); color: white;">Основная информация</button>
+                <button onclick="return swap();" class="border py-2 rounded" id="security" style="background-color: white">Безопасность</button>
+            </div>
+        </div>
+
+        <div class="col-md-6 py-4 border rounded">
+            <div class="container" id="mainInfForm">
+                <form action="" method="post">
+                    {{ main_inf.hidden_tag() }}
+
+                    <div class="d-flex justify-content-center align-items-center">
+                        <p class="me-3" style="white-space: nowrap">{{ main_inf.username.label }}</p>{{ main_inf.username(class="form-control") }}
+                    </div>
+
+                    <div class="d-flex mt-4 justify-content-center align-items-center">
+                        <p class="me-3" style="white-space: nowrap">{{ main_inf.email.label }}</p>{{ main_inf.email(class="form-control") }}
+                    </div>
+
+                    {{ main_inf.submit(class="btn mt-4", style="background-color: rgba(27,59,139,1); color: white") }}
+
+                </form>
+            </div>
+
+            <div class="container" style="display: none" id="passwordForm">
+                <form action="" method="post">
+                    {{ password_form.hidden_tag() }}
+
+                    <div class="d-flex justify-content-center align-items-center">
+                        <p class="me-3" style="white-space: nowrap">{{ password_form.old_password.label }}</p>{{ password_form.old_password(class="form-control") }}
+                    </div>
+
+                    <div class="d-flex mt-4 justify-content-center align-items-center">
+                        <p class="me-3" style="white-space: nowrap">{{ password_form.password1.label }}</p>{{ password_form.password1(class="form-control") }}
+                    </div>
+
+                    <div class="d-flex mt-4 justify-content-center align-items-center">
+                        <p class="me-3" style="white-space: nowrap">{{ password_form.password2.label }}</p>{{ password_form.password2(class="form-control") }}
+                    </div>
+
+                    {{ password_form.submit(class="btn mt-4", style="background-color: rgba(27,59,139,1); color: white") }}
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+<script>
+    function swap() {
+        let mainForm = document.getElementById('mainInfForm');
+        let pwdForm = document.getElementById('passwordForm');
+
+        let mainFormButton = document.getElementById('mainInfo');
+        let passwordFormButton = document.getElementById('security');
+
+        if (mainForm.style.display == 'none') {
+            pwdForm.style.display = 'none';
+            mainForm.style.display = '';
+
+            mainFormButton.style.background = 'rgba(27,59,139,1)';
+            mainFormButton.style.color = 'white';
+
+            passwordFormButton.style.background = 'white';
+            passwordFormButton.style.color = '';
+            }
+
+        else {
+            pwdForm.style.display = '';
+            mainForm.style.display = 'none';
+
+            mainFormButton.style.background = 'white';
+            passwordFormButton.style.background = 'rgba(27,59,139,1)';
+
+            mainFormButton.style.color = '';
+            passwordFormButton.style.color = 'white';
+
+        }
+    };
+</script>
+
+{% endblock %}
+
