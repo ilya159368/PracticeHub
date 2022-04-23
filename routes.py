@@ -1,3 +1,4 @@
+import json
 import os
 from os.path import join
 from flask import render_template, redirect, url_for, flash, request, send_file, escape, abort, \
@@ -20,7 +21,7 @@ from utils import allowed_file
 @app.route('/')
 @app.route('/index')
 def index():
-    courses = Course.query.limit(10).all()  # TODO: add order by likes(?..)
+    courses = Course.query.filter(Course.is_published == True).limit(10).all()
     return render_template('index.html', courses=courses)
 
 
@@ -144,11 +145,21 @@ def course(course_id):
         print(course.users)
         flash('Вы успешно поступили на курс', 'success')
         return redirect(url_for('lessons', course_id=course_id))
+
+    formatted_description = tag_parser.parse(course.desc, {}, True)
     hw_cnt = len(db.engine.execute(f"select p.add_task from page as p inner join lesson l on p.lesson_id = l.id where (p.add_task = 1) and (l.course_id = {course_id})").all())
     course_cnt = len(course.lessons)
     started = True if current_user in course.users else False
-    return render_template('course.html', course=course, course_cnt=course_cnt, hw_cnt=hw_cnt, started=started)
+    return render_template('course.html', course=course, course_cnt=course_cnt, hw_cnt=hw_cnt, started=started, published=course.is_published, formatted_desc=formatted_description)
 
+
+@app.route("/courses/<int:course_id>/publish", methods=['POST'])
+def on_publish(course_id):
+    course = Course.query.filter_by(id=course_id).first_or_404()
+    course.is_published = not bool(course.is_published)
+    db.session.add(course)
+    db.session.commit()
+    return redirect(url_for("course", course_id=course_id))
 
 @app.route('/courses/<int:course_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -186,6 +197,16 @@ def lessons(course_id):
 @app.route('/courses/<int:course_id>/lessons/create', methods=['GET', 'POST'])
 @login_required
 def create_lesson(course_id):
+    tag_docs = "<b>[B][/B]</b> - выделение текста жирным<br>" \
+               "<b>[I][/I]</b> - выделение текста курсивом<br>" \
+               "<b>[CODE][/CODE]</b> - текст принимает стиль кода<br>" \
+               "<b>[H][/H]</b> - большой текст (заголовок)<br>" \
+               "<b>[HR]</b> - разделяющая линия<br>" \
+               "<b>[COLOR #FFFFFF][/COLOR]</b> - выделение текста цветом<br>" \
+               "<b>[LINK name='lnk' url='https://youtube.com']</b> - ссылка<br>" \
+               '<b>[IMG name="z"]</b> - название изображения указывается в вкладке "Ресурсы"' \
+               '<b>[VIDEO name="z"]</b> - название видео указывается в вкладке "Ресурсы"'
+
     if request.method == 'POST':
         print(request.form)
         print(request.files)
@@ -230,7 +251,7 @@ def create_lesson(course_id):
         db.session.commit()
         return redirect(url_for('lessons', course_id=course_id))
     # get
-    return render_template('create_lesson.html')
+    return render_template('create_lesson.html', tag_docs=tag_docs)
 
 
 @app.route('/courses/<int:course_id>/lessons/<int:lesson_id>', methods=['GET', 'POST'])
@@ -293,36 +314,96 @@ def test_profile(id):
     return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
 
 
-@app.route("/api")
+@app.route("/docs/api")
 def api():
     current_api = [
-        {"title": "/api/get_username", "desc": "Used for getting user name", "params": [("id", "user id")],
-         "return": ("name", "user name"), "ex": "https://practicehub.org/api/get_username?id=1"},
+        {"title": "/api/get_user_info", "desc": "Used for getting user info", "params": [("id", "user id")],
+         "return": [("name", "user name"), ("avatar", "avatar path"), ("avatar_uuid", "unique id of avatar")], "ex": "https://practicehub.org/api/get_username?id=1"},
         {"title": "/api/get_course_icon", "desc": "Used for getting course icon (avatar) by id", "params": [("id", "course id")],
-         "return": ("img", "course icon"), "ex": "https://practicehub.org/api/get_course_icon?id=1"},
-        {"title": "/api/get_course_name", "desc": "Used for getting course name by id",
+         "return": [("img", "course icon")], "ex": "https://practicehub.org/api/get_course_icon?id=1"},
+        {"title": "/api/get_course_info", "desc": "Used for getting course info by id",
          "params": [("id", "course id")],
-         "return": ("name", "course name"), "ex": "https://practicehub.org/api/get_course_name?id=1"},
+         "return": [("name", "course name"), ("description", "course desc")], "ex": "https://practicehub.org/api/get_course_name?id=1"},
         {"title": "/api/get_course_id", "desc": "Used for getting course id by name",
          "params": [("name", "course name")],
-         "return": ("id", "course id"), "ex": "https://practicehub.org/api/get_course_id?name=Mega%20python"}
+         "return": [("id", "course id")], "ex": "https://practicehub.org/api/get_course_id?name=Mega%20python"}
     ]
 
     return render_template("api.html", apis=current_api)
 
 
-@app.route("/api/get_username")
-def get_name():
+@app.route("/docs/tags")
+def tags():
+    tags_api = [
+        {
+            "name": "[B][/B]",
+            "desc": " - это тег для выделения текста жирным, обязательно должен иметь закрывающий тег [/B]",
+            "ex": "это обычный текст [B]а это жирный[/B]",
+            "res": "это обычный текст <b>а это жирный</b>"
+        },
+        {
+            "name": "[I][/I]",
+            "desc": " - это тег для выделения текста курсивом, обязательно должен иметь закрывающий тег [/I]",
+            "ex": "это обычный текст [I]а это курсив[/I]",
+            "res": "это обычный текст <i>а это курсив</i>"
+        },
+        {
+            "name": "[H][/H]",
+            "desc": " - это тег преобразует текст в заголовок, обязательно должен иметь закрывающий тег [/H]",
+            "ex": "[H]это заголовок[/H]а это обычный текст",
+            "res": "<h1>это заголовок</h1>а это обычный текст"
+        },
+        {
+            "name": "[CODE][/CODE]",
+            "desc": " - это тег помещает текст в один блок и меняет шриф, обязательно должен иметь закрывающий тег [/CODE]",
+            "ex": "[CODE]print('Hi, PracticeHub!')[/CODE]",
+            "res": '<div style="background-color: #f5f5f5; border: 1px solid #d5d5d5; border-radius: 3px; line-height: normal;" class="px-3 py-1 my-3 w-50"><code>print("Hi, PracticeHub!")</code></div>'
+        },
+        {
+            "name": "[COLOR #******][/COLOR]",
+            "desc": " - это тег для изменения цвета текста, обязательно должен иметь закрывающий тег [/COLOR]",
+            "ex": "[COLOR #FF00FF]привет[/COLOR]",
+            "res": "<span style='color: #FF00FF'>привет</span>"
+        },
+        {
+            "name": "[HR]",
+            "desc": " - это тег для создания разделяющей полосы",
+            "ex": "некоторый текст [HR] еще текст",
+            "res": ""
+        },
+        {
+            "name": "[LINK name='' url='']",
+            "desc": " - это тег для создания ссылки обязательно должен иметь 2 аргумента (название и ссылку)",
+            "ex": "[LINK name='yt' url='https://youtube.com']",
+            "res": "<a href='https://youtube.com'>yt</a>"
+        },
+        {
+            "name": "[IMG name='']",
+            "desc": " - это тег для вставки картинки, name - название картинки во вкладке ресурсы (только в редакторе уроков)",
+            "ex": "[IMG name='z']",
+            "res": ""
+        },
+        {
+            "name": "[VIDEO name='']",
+            "desc": " - это тег для вставки видко, name - название видео во вкладке ресурсы (только в редакторе уроков)",
+            "ex": "[VIDEO name='z']",
+            "res": ""
+        },
+    ]
+
+    return render_template("tag_docs.html", tags=tags_api)
+
+
+@app.route("/api/get_user_info")
+def get_user_info():
     account_id = request.args["id"]
     user = User.query.filter(User.id == account_id).first()
-    return user.username
-
-
-@app.route("/api/get_course_icon")
-def get_course_icon():
-    course_id = request.args["id"]
-    course = Course.query.filter_by(id=course_id).first()
-    return send_file(course.img_path)
+    user_info = {
+        "name": user.username,
+        "avatar": user.img_path,
+        "avatar_uuid": user.img_uuid
+    }
+    return json.dumps(user_info)
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -366,11 +447,18 @@ def search():
                            active_tags=tags)
 
 
-@app.route("/api/get_course_name")
-def get_course_name():
+@app.route("/api/get_course_info")
+def get_course_info():
     course_id = request.args["id"]
     course = Course.query.filter_by(id=course_id).first()
-    return course.name
+    res = {
+        "name": course.name,
+        "description": course.desc,
+        "short_description": course.short_desc,
+        "is_published": course.is_published,
+        "author_id": course.author_id
+    }
+    return json.dumps(res)
 
 
 @app.route("/api/get_course_id")

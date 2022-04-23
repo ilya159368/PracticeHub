@@ -15,8 +15,29 @@ html, body, .t-b {
     line-height: normal;
 }
 
+.tooltip-inner {
+    max-width: 400px!important;
+    background-color: rgb(230, 230, 230)!important;
+    color: rgb(30, 30, 30)!important;
+    text-align: left!important;
+}
+
+.tooltip-arrow::before {
+    border-right-color: rgb(230, 230, 230)!important;
+}
+
+.tags-docs-text {
+    font-size: 20px;
+    font-weight: 400;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
 .btn:focus {
     box-shadow: none !important;
+}
+
+.published_check:checked {
+    background-color: var(--mbgc)!important;
 }
 
 .my-search-form {

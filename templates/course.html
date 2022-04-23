@@ -19,7 +19,7 @@
     <div class="row w-100">
         <div class="col-md-6" style="margin-left: 20vw;">
             <h4>О курсе</h4>
-            <p class="fs-6">{{ course.desc }}</p>
+            <p class="fs-6">{{ formatted_desc|safe }}</p>
         </div>
 
         <div class="col-md-4 me-auto" style="width: auto; margin-right: 20vw;">
@@ -41,9 +41,27 @@
                     <span class="my-2">Домашних заданий: <span class="fw-bold fs-6">{{ hw_cnt }}</span></span>
                 </div>
             </div>
+
+            {% if course.author_id == current_user.id %}
+                <div class="row py-3 px-2 mt-4">
+                    <form action="{{ url_for('on_publish', course_id=course.id) }}" method="post" id="published_form">
+                        <input type="checkbox" class="form-check-input published_check" id="published_check" {% if published %} checked {% endif %}>
+                        <label class="form-check-label" for="published_check">Опубликовать</label>
+                    </form>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
-
-
 {% endblock fullsize_content %}
+
+{% block script %}
+<script>
+    $(function () {
+        $("#published_check").click(function () {
+            $("#published_form").submit();
+            console.log("checkbox_click");
+        });
+    });
+</script>
+{% endblock script %}

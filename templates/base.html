@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgb(17,26,58); background: linear-gradient(95deg, rgba(17,26,58,1) 0%, rgba(27,59,139,1) 100%); box-shadow: 0 0 20px rgba(32, 45, 160, 0.5)">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgb(17,26,58); background: linear-gradient(95deg, rgba(17,26,58,1) 0%, rgba(27,59,139,1) 100%); box-shadow: 0 0 20px rgba(32, 45, 160, 0.5)" id="header">
     <div class="container-fluid">
       <div>
         <span class="navbar-brand">PracticeHub</span>
@@ -67,17 +67,17 @@
   {% endif %}
   {% endwith %}
   <!---->
-  <div class="container-fluid m-0 p-0">
+  <div class="container-fluid m-0 p-0" id="fullsize-content">
     {% block fullsize_content %}
     {% endblock fullsize_content %}
   </div>
-  <div class="container pt-5" id="content" style="min-height: 85.7vh">
+  <div class="container pt-5" id="content">
     {% block content %}
     {% endblock content %}
   </div>
 
   <!---->
-  <footer class="footer d-flex flex-wrap justify-content-between align-items-center py-4">
+  <footer class="footer d-flex flex-wrap justify-content-between align-items-center py-4" id="footer">
     <div class="col-md-4 d-flex align-items-center">
       <a href="/" class="me-2 mb-md-0 text-muted text-decoration-none lh-1">
         <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
@@ -87,7 +87,8 @@
 
     <div class="col-md-6">
       <a style="color: rgb(50, 50, 50)">Контакты</a><br>
-      <a href='{{ url_for("api") }}' style="color: rgb(50, 50, 50)">API</a><br>
+      <a href='{{ url_for("api") }}' style="color: rgb(50, 50, 50); text-decoration: none">API</a><br>
+      <a href='{{ url_for("tags") }}' style="color: rgb(50, 50, 50); text-decoration: none">Документация по тегам</a><br>
       <a style="color: rgb(50, 50, 50)">О проекте</a>
     </div>
   </footer>
@@ -96,7 +97,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
       $(function () {
-          $('#content').css('padding-bottom', `calc(2rem + ${$('footer').outerHeight()}px)`);
+        $('#content').css('min-height', `calc(100vh - ${$("#header").outerHeight()}px - ${$("#footer").outerHeight(true)}px - ${$("#fullsize-content").outerHeight(true)}px)`);
       });
   </script>
   {% block script %}

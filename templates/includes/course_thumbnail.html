@@ -10,7 +10,7 @@
       </div>
       <div class="col-md-9">
         <div class="card-body">
-          <h4 class="card-title">{{ c.name }}</h4>
+          <a href="{{ url_for('course', course_id=c.id) }}" style="text-decoration: none; color: #000000"><h4 class="card-title">{{ c.name }}</h4></a>
           <hr>
           <p class="text-justify font-weight-lighter m-0">{{ c.short_desc[:50] }}</p>
 

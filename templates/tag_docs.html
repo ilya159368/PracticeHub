@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %} Документация по тегам {% endblock title %}
+{% block content %}
+<div>
+    <span class="tags-docs-text" style="font-weight: 500!important"><b><span style="color: rgb(100, 120, 255)!important">Теги</span></b>
+        - способ форматирование текста на нашей платформе, они применяются при создании курса, а так же при создании уроков</span>
+</div>
+<div style="margin-top: 3rem">
+    {% for t in tags %}
+        <div style="margin-top: 2.5rem">
+            <span class="tags-docs-text"><b><span style="color: rgb(100, 120, 255)!important">{{ t["name"] }}</span></b>
+                {{ t["desc"] }}</span><br>
+            <span class="tags-docs-text"><b><span style="color: rgb(100, 120, 255)!important">Пример: </span></b>{{ t["ex"] }}</span><br>
+            {% if t["res"] != "" %}
+                <span class="tags-docs-text"><b><span style="color: rgb(100, 120, 255)!important">Результат: </span></b>{{ t["res"]|safe }}</span>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock content %}
