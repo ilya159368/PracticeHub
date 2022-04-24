@@ -8,56 +8,18 @@
         <div class="col-md-6 mx-auto" style="">
             <div style="display: flex;">
                 {{ form.hidden_tag() }}
-<!--                <input class="form-control" type="text" placeholder="Введите запрос"><button class="btn btn-primary ms-2">Поиск</button>-->
-                {{ form.req(class="form-control") }} {{ form.submit(class="btn btn-primary ms-2") }}
+                {{ form.req(class="form-control checkSearchInput") }} {{ form.submit(class="btn mbgc ms-2") }}
             </div>
             <hr>
             <div class="d-flex justify-content-center mt-3 float-start">
-                <a class="ms-0" onclick="return rating_sorter();">Рейтинг </a><i class="bi bi-bar-chart-fill" style="transform: rotate(270deg) scale(1, -1); display: none;" id="ratingIcon"></i>
-                <a class="ms-3" onclick="return sorter();">Алфавит </a><i class="bi bi-bar-chart-fill" style="transform: rotate(270deg) scale(1, -1); display: none;" id="alphIcon"></i>
-<!--            <div class="dropdown">-->
-<!--                <button class="btn btn-light dropdown-toggle px-2 border" type="button" id="menubtn" data-bs-toggle="dropdown" aria-expanded="false">Рейтинг</button>-->
-
-<!--                <ul class="dropdown-menu" aria-labelledby="menubtn">-->
-<!--                    <li><a href="" class="dropdown-item">По возрастанию</a></li>-->
-<!--                    <li><a href="" class="dropdown-item">По убыванию</a></li>-->
-<!--                </ul>-->
-<!--            </div>-->
-
+                <a class="ms-0 text-dark" style="cursor: pointer; user-select: none" onclick="return rating_sorter();">Рейтинг</a> <i class="bi bi-bar-chart-fill ms-2" style="transform: rotate(270deg) scale(1, -1);" id="ratingIcon"></i>
+                <a class="ms-3 text-dark" style="cursor: pointer; user-select: none" onclick="return sorter();">Алфавит</a> <i class="bi bi-bar-chart-fill ms-2" style="transform: rotate(270deg) scale(1, -1); display: none;" id="alphIcon"></i>
             </div>
         </div>
     </div>
 
     <div class="row px-0 mx-auto mt-4">
-        <div class="col-md-3">
-<!--            <div style="display: flex; justify-content: center;">-->
-<!--                <div>-->
-<!--                    <h5>Начало</h5>-->
-<!--                    <div class="form-check">-->
-<!--                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">-->
-<!--                        <label class="form-check-label" for="flexCheckDefault">Начался</label>-->
-<!--                    </div>-->
-<!--                    <div class="form-check">-->
-<!--                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault1">-->
-<!--                        <label class="form-check-label" for="flexCheckDefault1">Не начался</label>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-            <div class="w-50 mx-auto mt-4"> <!-- Поиск по тегам -->
-                <h5>Теги</h5>
-                <input class="form-control" type="text" placeholder="Найти тег" id="tagSearch" onkeyup="search_tag()" style="display: none;">
-                <form class="m-0 p-0" action="" method="post">
-                    <ul class="list-group mt-3" id="tagsList">
-                        {% for tag in tags %}
-                                <li class="list-group-item" style="border: none; display: {% if loop.index <= 3 %} flex {% else %} none {% endif %};" id="li{{ loop.index }}"><input type="checkbox" class="form-check-input me-1" name="{{ tag }}" {% if tag in active_tags %} checked="checked" {% endif %}><p class="my-0">{{ tag }}</p></li>
-                        {% endfor %}
-                    </ul>
-                </form>
-                <a class="" onclick="return new_show({{ tags|length }});" style="text-decoration: underline; color: black; cursor: pointer;" id="showButton">Показать</a>
-            </div>
-        </div>
-
+        <div class="col-md-3"></div>
         <div class="col-md-6">
             {% if courses|length == 0 %}
                 <div style="align-items: center">
@@ -78,53 +40,7 @@
 {% endblock %}
 
 {% block script %}
-<script language="JavaScript">
-    function search_tag() {
-        let search = document.getElementById('tagSearch').value;
-        let lst = document.getElementById('tagsList');
-        let tags = lst.getElementsByTagName('li');
-
-        for (let i = 0; i < tags.length; i++) {
-            let now_tag = tags[i].getElementsByTagName('p')[0];
-            if ((now_tag.textContent || now_tag.innerText).toUpperCase().indexOf(search.toUpperCase()) > -1) {
-                tags[i].style.display = "flex";
-            }
-            else {
-                tags[i].style.display = "none";
-            }
-        }
-    };
-
-    function new_show(n) {
-        var btn = document.getElementById('showButton');
-
-        if (btn.textContent == 'Показать') {
-             document.getElementById('tagSearch').style.display = 'block'
-             btn.textContent = 'Скрыть'
-
-             for (let i = 4; i <= n; i++) {
-                document.getElementById('li' + i.toString(10)).style.display = 'flex'
-            }
-        }
-
-        else {
-            btn.textContent = 'Показать'
-            document.getElementById('tagSearch').style.display = 'none'
-            document.getElementById('tagSearch').value = ''
-            search_tag()
-
-            for (let i = 1; i <= n; i++) {
-                let element = document.getElementById('li' + i.toString(10))
-                if (i < 4) {
-                    element.style.display = 'flex'
-                }
-                else {
-                    element.style.display = 'none'
-                }
-            }
-        }
-    };
-
+<script>
     function comparator(a, b) {  // функция сравнения для сортировки по алфавиту
         var hsA = a.getElementsByTagName('h4');
         var hsB = b.getElementsByTagName('h4');

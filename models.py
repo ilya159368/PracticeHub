@@ -1,3 +1,6 @@
+from sqlalchemy import func, select
+from sqlalchemy.orm import column_property
+
 from main import db, login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,8 +17,10 @@ class MyCourses(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True)
     liked = db.Column(db.Boolean, default=False)
-    user = db.relationship("User", backref="my_courses")
-    course = db.relationship("Course", backref="users")
+
+    def __init__(self, course=None, user=None):
+        self.course = course
+        self.user = user
 
 
 class User(UserMixin, db.Model):
@@ -30,7 +35,6 @@ class User(UserMixin, db.Model):
     img_uuid = db.Column(db.String(64), index=True)
 
     task_check = db.relationship("TaskCheck", backref="user")
-    # my_courses = association_proxy('my_courses', 'course') #  creator=lambda course: MyCourses(course=course)
 
     # TODO: date created
 
@@ -57,7 +61,9 @@ class Course(db.Model):
     img_uuid = db.Column(db.String(64), index=True)
 
     is_published = db.Column(db.Boolean, default=False)
-    users = association_proxy('my_courses', 'user') # creator=lambda user: MyCourses(user=user)
+    users = db.relationship('User', secondary=MyCourses.__table__, backref='course')
+
+    likes = column_property(select(func.count(MyCourses.liked)).where(MyCourses.course_id == id).scalar_subquery())
 
     # author
 
