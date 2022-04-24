@@ -14,7 +14,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgb(17,26,58); background: linear-gradient(95deg, rgba(17,26,58,1) 0%, rgba(27,59,139,1) 100%); box-shadow: 0 0 20px rgba(32, 45, 160, 0.5)" id="header">
     <div class="container-fluid">
       <div>
-        <span class="navbar-brand">PracticeHub</span>
+        <a href="{{ url_for('promo') }}" style="text-decoration: none"><span class="navbar-brand">PracticeHub</span></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -42,7 +42,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            {% block catalog_link %}<a class="nav-link" href="{{ url_for('index') }}">Каталог</a>{% endblock catalog_link %}
+            {% block catalog_link %}<a class="nav-link" href="{{ url_for('catalog') }}">Каталог</a>{% endblock catalog_link %}
           </li>
           <li class="nav-item">
             {% block news_link %}<a class="nav-link" href="#">Новости</a>{% endblock news_link %}
@@ -111,18 +111,18 @@
 
   <!---->
   <footer class="footer d-flex flex-wrap justify-content-between align-items-center py-4" id="footer">
-    <div class="col-md-4 d-flex align-items-center">
-      <a href="/" class="me-2 mb-md-0 text-muted text-decoration-none lh-1">
-        <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
-      </a>
+    <div class="col-md-4" style="text-align: center">
       <span style="color: rgb(160, 160, 160)">© 2022 Practice Hub, Inc</span>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-4" style="text-align: center">
       <a style="color: rgb(50, 50, 50)">Контакты</a><br>
+      <a style="color: rgb(50, 50, 50)">О проекте</a>
+    </div>
+
+    <div class="col-md-4" style="text-align: center">
       <a href='{{ url_for("api") }}' style="color: rgb(50, 50, 50); text-decoration: none">API</a><br>
       <a href='{{ url_for("tags") }}' style="color: rgb(50, 50, 50); text-decoration: none">Документация по тегам</a><br>
-      <a style="color: rgb(50, 50, 50)">О проекте</a>
     </div>
   </footer>
   {# scripts #}

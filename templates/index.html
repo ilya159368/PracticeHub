@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% from 'includes/course_thumbnail.html' import course_thumbnail with context %}
-{% block catalog_link %}<a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Каталог</a>{% endblock catalog_link %}
+{% block catalog_link %}<a class="nav-link active" aria-current="page" href="{{ url_for('catalog') }}">Каталог</a>{% endblock catalog_link %}
 {% block content %}
 <div class="w-75 mx-auto">
   {% for c in courses %}
