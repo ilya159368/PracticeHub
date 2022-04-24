@@ -14,8 +14,8 @@ class MyCourses(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True)
     liked = db.Column(db.Boolean, default=False)
-    user = db.relationship("User", back_populates="my_courses")
-    course = db.relationship("Course", back_populates="users")
+    user = db.relationship("User", backref="my_courses")
+    course = db.relationship("Course", backref="users")
 
 
 class User(UserMixin, db.Model):
@@ -30,7 +30,7 @@ class User(UserMixin, db.Model):
     img_uuid = db.Column(db.String(64), index=True)
 
     task_check = db.relationship("TaskCheck", backref="user")
-    my_courses = association_proxy('my_courses', 'course', creator=lambda course: MyCourses(course=course))
+    # my_courses = association_proxy('my_courses', 'course') #  creator=lambda course: MyCourses(course=course)
 
     # TODO: date created
 
@@ -57,7 +57,7 @@ class Course(db.Model):
     img_uuid = db.Column(db.String(64), index=True)
 
     is_published = db.Column(db.Boolean, default=False)
-    users = association_proxy('my_courses', 'user', creator=lambda user: MyCourses(user=user))
+    users = association_proxy('my_courses', 'user') # creator=lambda user: MyCourses(user=user)
 
     # author
 

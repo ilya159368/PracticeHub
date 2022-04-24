@@ -6,7 +6,7 @@ from flask import render_template, redirect, url_for, flash, request, send_file,
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from uuid import uuid4
-from sqlalchemy import func
+from sqlalchemy import func, desc
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
@@ -460,18 +460,12 @@ def search():
         form.req.data = request.form['searchInput']
 
     if form.req.data:
-        req = form.req.data
-
-    #     courses = Course.query.filter(Course.short_desc.contains(req) | Course.name.contains(req)) & (Course.is_published == True))\
-    #         .join(my_courses, my_courses.course_id == Course.id)\
-    #         .group_by()\
-    #         .order_by()
-    # else:
+        req = f'%{form.req.data.lower()}%'
+        courses = db.session.query(Course, func.count(MyCourses.liked)).filter((Course.short_desc.ilike(req) | Course.name.ilike(req)) & (Course.is_published == True)).join(MyCourses, Course.id == MyCourses.course_id, isouter=True).group_by(Course).order_by(desc(func.count(MyCourses.liked)))
+    else:
         courses = Course.query.filter(Course.is_published == True)
-
-
     courses = courses.all()
-
+    courses = [i[0] for i in courses]
     return render_template('search.html', courses=courses, form=form, active_tags=tags)
 
 
