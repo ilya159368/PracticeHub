@@ -5,9 +5,9 @@
   <h1 class="text-center">Профиль</h1>
   <div class="row mt-profile">
     <div class="col-lg-3 col-xs-12 order-2 order-lg-1 row-profile px-3 align-items-center d-flex">
-      <img src="https://cdn.discordapp.com/attachments/917080744843706418/945760855902027858/IMG_20220222_221550_060.jpg" alt="пусто" class="border border-dark p-0" style="width: 100%">
+      <img src="{{ avatar_path }}" alt="пусто" class="p-0" style="width: 100%; border-radius: 5px;">
     </div>
-    <div class="col-lg-9 col-xs-12 px-0 order-1 order-lg-2 rounded py-2 px-3" style="background-color: rgb(240, 240, 240);">
+    <div class="col-lg-9 col-xs-12 px-0 order-1 order-lg-2 rounded py-2 px-3" style="background-color: rgb(240, 240, 240); box-shadow: 0 0 3rem rgba(0, 0, 0, 0.08)">
       <div class="" style="width: fit-content">
         <div class="row h5 mb-3">
           <span>
@@ -25,11 +25,13 @@
       </div>
     </div>
   </div>
-  <div class="row justify-content-between mt-5 mb-5">
-    <a href="{{ url_for('edit_profile', id=current_user.id) }}" class="btn btn-outline-primary w-45">Изменить профиль</a>
-    <a href="#" class="btn btn-outline-primary w-45">Удалить аккаунт</a>
-  </div>
-  <div class="d-flex justify-content-center row"> <!-- buttons -->
+  {% if user.id == current_user.id %}
+    <div class="row justify-content-between mt-5">
+      <a href="{{ url_for('edit_profile', id=current_user.id) }}" class="btn w-45 profile-button">Изменить профиль</a>
+      <a href="#" class="btn w-45 profile-button">Удалить аккаунт</a>
+    </div>
+  {% endif %}
+  <div class="d-flex justify-content-center row mt-5"> <!-- buttons -->
     <ul class="nav sm-column w-100 pe-0" id="buttons" role="tablist">
       <li class="nav-item active px-3 profile-link border w-50 text-center"
           style="border-width: 0.1rem; border-radius: 50rem 0 0 50rem;">
