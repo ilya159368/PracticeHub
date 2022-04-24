@@ -20,7 +20,9 @@ from utils import allowed_file
 
 @app.route('/catalog')
 def catalog():
-    courses = Course.query.filter(Course.is_published == True).limit(10).all()
+    courses = Course.query.filter(Course.is_published == True).order_by(Course.likes.desc()).limit(20).all()
+    # like_cnt_lst = db.engine.execute(
+    #     f'select liked from course c left join my_courses mc on mc.course_id = c.id where c.author_id = {current_user.id}').all()
     return render_template('index.html', courses=courses)
 
 
@@ -105,7 +107,7 @@ def news():
 def teaching():
     courses = Course.query.filter_by(author_id=current_user.id).all()
     checks = []
-    task_checks = TaskCheck.query.filter(TaskCheck.status.is_(None)).all()
+    task_checks = TaskCheck.query.filter(TaskCheck.status.is_(None)).order_by(TaskCheck.date.desc()).all()
     for task in task_checks:
         if task.page.lesson.course.author_id == current_user.id:
             checks.append(task)
@@ -120,7 +122,6 @@ def teaching():
                 db.session.add(task_check)
                 db.session.commit()
         return redirect(url_for('teaching'))
-
     return render_template('teaching.html', courses=courses, checks=checks)
 
 
@@ -151,7 +152,7 @@ def course(course_id):
     course = Course.query.filter_by(id=course_id).first_or_404()
     if request.method == 'POST':
         course.users.append(current_user)
-        db.session.add(course)
+        db.session.add(current_user)
         db.session.commit()
         print(course.users)
         flash('Вы успешно поступили на курс', 'success')
@@ -306,7 +307,7 @@ def lesson(course_id, lesson_id):
         img_convert[f.name] = url_for('get_file', path=f.path)
     for k, p in enumerate(les.pages):
         contents.append(tag_parser.parse(p.text, img_convert))
-        checks = TaskCheck.query.filter_by(page_id=p.id).all()
+        checks = TaskCheck.query.filter_by(page_id=p.id, user_id=current_user.id).all()
         if p.add_task:
             if len(checks) == 0 or checks[-1].status != 1:
                 should_show_homework = True
@@ -484,11 +485,11 @@ def search():
 
     if form.req.data:
         req = f'%{form.req.data.lower()}%'
-        courses = db.session.query(Course, func.count(MyCourses.liked)).filter((Course.short_desc.ilike(req) | Course.name.ilike(req)) & (Course.is_published == True)).join(MyCourses, Course.id == MyCourses.course_id, isouter=True).group_by(Course).order_by(desc(func.count(MyCourses.liked)))
+        # courses = db.session.query(Course, func.count(MyCourses.liked)).filter((Course.short_desc.ilike(req) | Course.name.ilike(req)) & (Course.is_published == True)).join(MyCourses, Course.id == MyCourses.course_id, isouter=True).group_by(Course).order_by(desc(func.count(MyCourses.liked)))
+        courses = Course.query.filter((Course.short_desc.ilike(req) | Course.name.ilike(req)) & (Course.is_published == True)).order_by(Course.likes.desc())
     else:
         courses = Course.query.filter(Course.is_published == True)
     courses = courses.all()
-    courses = [i[0] for i in courses]
     return render_template('search.html', courses=courses, form=form, active_tags=tags)
 
 
