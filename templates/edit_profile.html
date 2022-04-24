@@ -6,13 +6,13 @@
     <div class="row mx-auto">
       <div class="col-md-3">
         <div class="d-flex flex-column text-center">
-          <button onclick="return swap();" class="border py-2 rounded" id="mainInfo"
+          <button class="border py-2 rounded" id="mainInfo"
                   style="background-color: rgba(27,59,139,1); color: white;">Основная информация
           </button>
-          <button onclick="return swap();" class="border py-2 rounded" id="security"
+          <button class="border py-2 rounded" id="security"
                   style="background-color: white">Безопасность
           </button>
-          <button onclick="return swap();" class="border py-2 rounded" id="security"
+          <button  class="border py-2 rounded" id="avatar"
                   style="background-color: white">Фото профиля
           </button>
         </div>
@@ -85,6 +85,16 @@
             {{ password_form.submit(class="btn mt-4", style="background-color: rgba(27,59,139,1); color: white") }}
           </form>
         </div>
+        <div class="container" style="display: none" id="avatarForm">
+          <form action="" method="post" enctype="multipart/form-data" novalidate>
+            {{ avatar_form.hidden_tag() }}
+            <div class="mb-3">
+              <span class="me-3" style="white-space: nowrap">{{ avatar_form.avatar.label }}</span>
+              {{ avatar_form.avatar(class="form-control") }}
+            </div>
+            {{ avatar_form.submit(class="btn mt-4", style="background-color: rgba(27,59,139,1); color: white") }}
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -92,34 +102,61 @@
 
 {% block script %}
   <script>
-      function swap() {
-          let mainForm = document.getElementById('mainInfForm');
-          let pwdForm = document.getElementById('passwordForm');
+      $(function() {
+          let main_info_btn = $("#mainInfo");
+          let security_btn = $("#security");
+          let avatar_btn = $("#avatar");
 
-          let mainFormButton = document.getElementById('mainInfo');
-          let passwordFormButton = document.getElementById('security');
+          let main_info_form = $("#mainInfForm");
+          let password_form = $("#passwordForm");
+          let avatar_form = $("#avatarForm");
 
-          if (mainForm.style.display === 'none') {
-              pwdForm.style.display = 'none';
-              mainForm.style.display = '';
 
-              mainFormButton.style.background = 'rgba(27,59,139,1)';
-              mainFormButton.style.color = 'white';
+          main_info_btn.click(function() {
+              password_form.css("display", "none");
+              avatar_form.css("display", "none");
+              main_info_form.css("display", "block");
 
-              passwordFormButton.style.background = 'white';
-              passwordFormButton.style.color = '';
-          } else {
-              pwdForm.style.display = '';
-              mainForm.style.display = 'none';
+              main_info_btn.css("background", "rgba(27,59,139,1)");
+              main_info_btn.css("color", "white");
 
-              mainFormButton.style.background = 'white';
-              passwordFormButton.style.background = 'rgba(27,59,139,1)';
+              security_btn.css("background", "white");
+              security_btn.css("color", "black");
 
-              mainFormButton.style.color = '';
-              passwordFormButton.style.color = 'white';
+              avatar_btn.css("background", "white");
+              avatar_btn.css("color", "black");
+          });
 
-          }
-      }
+          security_btn.click(function() {
+              password_form.css("display", "block");
+              avatar_form.css("display", "none");
+              main_info_form.css("display", "none");
+
+              main_info_btn.css("background", "white");
+              main_info_btn.css("color", "black");
+
+              security_btn.css("background", "rgba(27,59,139,1)");
+              security_btn.css("color", "white");
+
+              avatar_btn.css("background", "white");
+              avatar_btn.css("color", "black");
+          });
+
+          avatar_btn.click(function() {
+              password_form.css("display", "none");
+              avatar_form.css("display", "block");
+              main_info_form.css("display", "none");
+
+              main_info_btn.css("background", "white");
+              main_info_btn.css("color", "black");
+
+              security_btn.css("background", "white");
+              security_btn.css("color", "black");
+
+              avatar_btn.css("background", "rgba(27,59,139,1)");
+              avatar_btn.css("color", "white");
+          });
+      });
   </script>
 
 {% endblock %}

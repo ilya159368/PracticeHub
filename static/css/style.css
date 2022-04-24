@@ -89,7 +89,18 @@ html, body, .t-b {
 
 .w-profile {
         width: 50%;
-    }
+}
+
+.profile-button:hover {
+    color: white!important;
+    background: var(--mbgc)!important;
+}
+
+.profile-button {
+    color: black!important;
+    border: solid 1px var(--mbgc)!important;
+    transition: 0.5s!important;
+}
 
 @media (max-width: 992px) {
     /* profile */

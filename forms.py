@@ -59,3 +59,8 @@ class EditMainInfo(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired()])
     email = StringField('Электронная почта', validators=[DataRequired(), Email()])
     submit = SubmitField('Сохранить')
+
+
+class EditAvatar(FlaskForm):
+    avatar = FileField("Выберите новый аватар")
+    submit = SubmitField("Сохранить")

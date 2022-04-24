@@ -29,8 +29,8 @@
         <a class="" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"
            role="button">
           <img
-              src="https://media-exp1.licdn.com/dms/image/C560BAQHMnA03XDdf3w/company-logo_200_200/0/1519855918965?e=2159024400&v=beta&t=CrP5Le1mWICRcaxIGNBuajHcHGFPuyNA5C8DI339lSk"
-              alt="пусто" height="40" width="40">
+              src='{{ url_for("get_file", path=current_user.img_path) if current_user.img_path else url_for("get_file", path="static/images/default_avatar.jpg") }}'
+              alt="пусто" height="40" width="40" style="border-radius: 3px;">
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
           <li><a class="dropdown-item"

@@ -13,7 +13,7 @@ from werkzeug.exceptions import HTTPException
 
 import tag_parser
 from main import app, db
-from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm, EditMainInfo, EditPassword
+from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm, EditMainInfo, EditPassword, EditAvatar
 from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, MyCourses
 from utils import allowed_file
 
@@ -91,7 +91,9 @@ def profile(id):
 
     courses = len(Course.query.filter_by(author_id=id).all())
 
-    return render_template('profile.html', user=user, courses_cnt=courses)
+    avatar_path = url_for("get_file", path=user.img_path) if user.img_path else url_for("get_file", path="static/images/default_avatar.jpg")
+
+    return render_template('profile.html', user=user, courses_cnt=courses, current_user=current_user, avatar_path=avatar_path)
 
 
 @app.route('/news', methods=['GET', 'POST'])
@@ -329,6 +331,11 @@ def edit_profile(id):
 
     main_inf = EditMainInfo()
     pwd = EditPassword()
+    avatar_form = EditAvatar()
+
+    if id != current_user.id:
+        flash("Вы не можете редактировать чужой профиль", "danger")
+        return redirect(url_for('profile', id=id))
 
     if main_inf.validate_on_submit():
         have_errors = False
@@ -356,9 +363,25 @@ def edit_profile(id):
             return redirect(url_for('profile', id=id))
         else:
             pwd.old_password.errors.append('Неверный старый пароль')
+    elif avatar_form.validate_on_submit():
+        f = avatar_form.avatar.data
+        if f:
+            filename = f.filename
+            if not allowed_file(filename):
+                # TODO: do smth
+                ...
+            _uuid = uuid4().hex
+            ext = filename.split('.')[-1]
+            path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'],
+                                _uuid + '.' + ext)
+            f.save(path)
+            user.img_path = path
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for('profile', id=id))
     main_inf.username.data = user.username
     main_inf.email.data = user.email
-    return render_template('edit_profile.html', main_inf=main_inf, password_form=pwd, is_post=True if request.method == 'POST' else False)
+    return render_template('edit_profile.html', main_inf=main_inf, password_form=pwd, avatar_form=avatar_form, is_post=True if request.method == 'POST' else False)
 
 
 @app.route("/docs/api")
