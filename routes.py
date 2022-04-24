@@ -1,3 +1,4 @@
+import json
 import os
 from os.path import join
 from flask import render_template, redirect, url_for, flash, request, send_file, escape, abort, \
@@ -5,7 +6,7 @@ from flask import render_template, redirect, url_for, flash, request, send_file,
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from uuid import uuid4
-import pymorphy3
+from sqlalchemy import func
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
@@ -13,7 +14,7 @@ from werkzeug.exceptions import HTTPException
 import tag_parser
 from main import app, db
 from forms import LoginForm, RegistrationForm, CourseDescForm, SearchForm, EditMainInfo, EditPassword
-from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, Tag
+from models import User, load_user, Course, Lesson, Page, LessonFile, TaskCheck, MyCourses
 from utils import allowed_file
 
 
@@ -54,7 +55,8 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('catalog')
         return redirect(next_page)
-    return render_template('login.html', form=form, is_post=True if request.method == 'POST' else False)
+    return render_template('login.html', form=form,
+                           is_post=True if request.method == 'POST' else False)
 
 
 @app.route('/logout')
@@ -115,6 +117,7 @@ def teaching():
                 task_check.status = 1 if int(v) else 0
                 db.session.add(task_check)
                 db.session.commit()
+        return redirect(url_for('teaching'))
 
     return render_template('teaching.html', courses=courses, checks=checks)
 
@@ -124,11 +127,13 @@ def teaching():
 def create_course():
     form = CourseDescForm()
     if form.validate_on_submit():
-        course = Course(name=form.name.data, desc=form.desc.data, short_desc=form.short_desc.data, author=current_user)
+        course = Course(name=form.name.data, desc=form.desc.data, short_desc=form.short_desc.data,
+                        author=current_user)
         f = form.img.data
         ext = secure_filename(f.filename).split('.')[-1]
         _uuid = uuid4().hex
-        path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'], _uuid + '.' + ext)
+        path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'],
+                            _uuid + '.' + ext)
         course.img_path = path
         course.img_uuid = _uuid
         f.save(path)
@@ -154,7 +159,13 @@ def course(course_id):
     hw_cnt = len(db.engine.execute(f"select p.add_task from page as p inner join lesson l on p.lesson_id = l.id where (p.add_task = 1) and (l.course_id = {course_id})").all())
     course_cnt = len(course.lessons)
     started = True if current_user in course.users else False
-    return render_template('course.html', course=course, course_cnt=course_cnt, hw_cnt=hw_cnt, started=started, published=course.is_published, formatted_desc=formatted_description)
+    liked = db.engine.execute(f'select liked from my_courses where user_id = {current_user.id} and course_id = {course_id}').first() or False
+    if liked:
+        liked = liked[0]
+    print(liked)
+    like_cnt = len(db.engine.execute(f'select liked from my_courses where course_id = {course_id} and liked = 1').all())
+    return render_template('course.html', course=course, course_cnt=course_cnt, hw_cnt=hw_cnt, started=started, published=course.is_published,
+                           formatted_desc=formatted_description, liked=liked, like_cnt=like_cnt)
 
 
 @app.route("/courses/<int:course_id>/publish", methods=['POST'])
@@ -208,7 +219,7 @@ def create_lesson(course_id):
                "<b>[HR]</b> - разделяющая линия<br>" \
                "<b>[COLOR #FFFFFF][/COLOR]</b> - выделение текста цветом<br>" \
                "<b>[LINK name='lnk' url='https://youtube.com']</b> - ссылка<br>" \
-               '<b>[IMG name="z"]</b> - название изображения указывается в вкладке "Ресурсы"' \
+               '<b>[IMG name="z"]</b> - название изображения указывается в вкладке "Ресурсы"<br>' \
                '<b>[VIDEO name="z"]</b> - название видео указывается в вкладке "Ресурсы"'
 
     if request.method == 'POST':
@@ -237,7 +248,8 @@ def create_lesson(course_id):
                 ...
             _uuid = uuid4().hex
             ext = filename.split('.')[-1]
-            path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'], _uuid + '.' + ext)
+            path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'],
+                                _uuid + '.' + ext)
             fv.save(path)
             lesson_file = LessonFile(path=path, uuid=_uuid, name=user_filename, lesson=lesson)
             db.session.add(lesson_file)
@@ -274,12 +286,15 @@ def lesson(course_id, lesson_id):
                 ...
             _uuid = uuid4().hex
             ext = filename.split('.')[-1]
-            path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_HW_SUBFOLDER'], _uuid + '.' + ext)
+            path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_HW_SUBFOLDER'],
+                                _uuid + '.' + ext)
             v.save(path)
-            task_check = TaskCheck(user=current_user, page=les.pages[index], file=path, page_index=index)
+            task_check = TaskCheck(user=current_user, page=les.pages[index], file=path,
+                                   page_index=index)
             db.session.add(task_check)
         db.session.commit()
         flash('Домашние задания успешно сохранены', 'success')
+        return redirect(url_for('lesson', course_id=course_id, lesson_id=lesson_id))
     img_convert = {}
     contents = []
     colors = ["#6c757d" for _ in les.pages]
@@ -301,46 +316,48 @@ def lesson(course_id, lesson_id):
         else:
             colors[k] = "var(--mbgc)"
 
-    return render_template('lesson.html', lesson=les, contents=contents, course=les.course, pages=les.pages,
-                           show_hw=should_show_homework, circle_colors=colors, draw_hw=draw_hw)
+    return render_template('lesson.html', lesson=les, contents=contents, course=les.course,
+                           pages=les.pages, show_hw=should_show_homework, circle_colors=colors,
+                           draw_hw=draw_hw)
 
 
-@app.route('/test', methods=['GET', 'POST'])
+@app.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
-def test_profile():
-    messages = []
-
-    user = User.query.filter(User.id == current_user.id).first()
+def edit_profile(id):
+    user = User.query.filter(User.id == id).first()
 
     main_inf = EditMainInfo()
     pwd = EditPassword()
 
-    if request.method == 'GET':
-        main_inf.username.data = user.username
-        main_inf.email.data = user.email
-
     if main_inf.validate_on_submit():
-        user.username = main_inf.username.data
-        user.email = main_inf.email.data
-
-        db.session.add(user)
-        db.session.commit()
-
-    else:
-        main_inf.username.data = user.username
-        main_inf.email.data = user.email
-
-    if pwd.validate_on_submit():
+        have_errors = False
+        user_name = User.query.filter_by(username=main_inf.username.data).first()
+        if user_name and user_name.id != current_user.id:
+            main_inf.username.errors.append('Имя уже занято')
+            have_errors = True
+        user_email = User.query.filter_by(email=main_inf.email.data).first()
+        if user_email and user_email.id != current_user.id:
+            main_inf.email.errors.append('Почта уже используется')
+            have_errors = True
+        if not have_errors:
+            user.username = main_inf.username.data
+            user.email = main_inf.email.data
+            db.session.add(user)
+            db.session.commit()
+            flash('Основная информация успешно изменена', 'success')
+            return redirect(url_for('profile', id=id))
+    elif pwd.validate_on_submit():
         if user.check_password(pwd.old_password.data):
             user.set_password(pwd.password1.data)
             db.session.add(user)
             db.session.commit()
-    else:
-        main_inf.username.data = user.username
-        main_inf.email.data = user.email
-
-    return render_template('edit_profile.html', main_inf=main_inf, password_form=pwd)
-    # return render_template('test_profile.html', user=user, courses=created_courses, can_edit=can_edit)
+            flash('Пароль успешно изменен', 'success')
+            return redirect(url_for('profile', id=id))
+        else:
+            pwd.old_password.errors.append('Неверный старый пароль')
+    main_inf.username.data = user.username
+    main_inf.email.data = user.email
+    return render_template('edit_profile.html', main_inf=main_inf, password_form=pwd, is_post=True if request.method == 'POST' else False)
 
 
 @app.route("/docs/api")
@@ -434,6 +451,7 @@ def get_user_info():
     }
     return json.dumps(user_info)
 
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()
@@ -441,29 +459,20 @@ def search():
     if request.method == 'POST' and 'searchInput' in request.form.keys():
         form.req.data = request.form['searchInput']
 
-    tags = [key for key, value in request.form.items() if value == 'on']
     if form.req.data:
         req = form.req.data
 
-        morph = pymorphy3.MorphAnalyzer()
-        normal = morph.normal_forms(req)[0]
-        courses = Course.query.filter(Course.desc.contains(req) | Course.short_desc.contains(req) |
-                                      Course.desc.contains(normal) | Course.short_desc.contains(normal) |
-                                      Course.desc.contains(req) | Course.short_desc.contains(req) |
-                                      Course.name.contains(req) | Course.name.contains(req)
-                                      ).filter(Course.is_published == True).order_by(Course.rating.desc())
-    else:
+    #     courses = Course.query.filter(Course.short_desc.contains(req) | Course.name.contains(req)) & (Course.is_published == True))\
+    #         .join(my_courses, my_courses.course_id == Course.id)\
+    #         .group_by()\
+    #         .order_by()
+    # else:
         courses = Course.query.filter(Course.is_published == True)
 
-    if tags:
-        for t in tags:
-            courses = courses.filter(Course.tags.any(Tag.tag == t))
 
     courses = courses.all()
-    filter_tags = [t.tag for t in Tag.query.all()]
 
-    return render_template('search.html', courses=courses, form=form, tags=filter_tags,
-                           active_tags=tags)
+    return render_template('search.html', courses=courses, form=form, active_tags=tags)
 
 
 @app.route("/api/get_course_info")
@@ -492,3 +501,9 @@ def get_course_id():
 @app.errorhandler(HTTPException)
 def handle_exception(e):
     return render_template("error.html", errorname=e.name, cat_img=f"https://http.cat/{e.code}")
+
+
+@app.route("/like/<int:course_id>", methods=["POST"])
+def like(course_id):
+    db.engine.execute(f'update my_courses set liked = not liked where user_id = {current_user.id} and course_id = {course_id}')
+    return redirect(url_for('course', course_id=course_id))

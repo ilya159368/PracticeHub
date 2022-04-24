@@ -7,8 +7,12 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>{% block title %}PracticeHub{% endblock title %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+        crossorigin="anonymous">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgb(17,26,58); background: linear-gradient(95deg, rgba(17,26,58,1) 0%, rgba(27,59,139,1) 100%); box-shadow: 0 0 20px rgba(32, 45, 160, 0.5)" id="header">
@@ -22,81 +26,58 @@
       {% if current_user.is_authenticated %}
 
       <div class="mx-3 order-lg-2 dropdown ms-4">
-        <a class="" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" role="button">
-          <img src="https://media-exp1.licdn.com/dms/image/C560BAQHMnA03XDdf3w/company-logo_200_200/0/1519855918965?e=2159024400&v=beta&t=CrP5Le1mWICRcaxIGNBuajHcHGFPuyNA5C8DI339lSk" alt="пусто" height="40" width="40">
+        <a class="" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"
+           role="button">
+          <img
+              src="https://media-exp1.licdn.com/dms/image/C560BAQHMnA03XDdf3w/company-logo_200_200/0/1519855918965?e=2159024400&v=beta&t=CrP5Le1mWICRcaxIGNBuajHcHGFPuyNA5C8DI339lSk"
+              alt="пусто" height="40" width="40">
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-          <li><a class="dropdown-item" href="{{ url_for('profile', id=current_user.id) }}">Профиль</a></li>
+          <li><a class="dropdown-item"
+                 href="{{ url_for('profile', id=current_user.id) }}">Профиль</a></li>
           <li><a class="dropdown-item" href="#">Мои курсы</a></li>
           <li><a class="dropdown-item" href="{{ url_for('teaching') }}">Преподавание</a></li>
           <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a></li>
         </ul>
       </div>
 
-      {% else %}
+    {% else %}
       <div class="d-flex order-lg-2 ms-4">
-        <a href="{{ url_for('login') }}" class="btn me-2" style="color: white; border-color: rgba(73, 113, 191, 0.7)">Войти</a>
-        <a href="{{ url_for('register') }}" class="btn" style="color: white; border-color: rgba(73, 113, 191, 0.7)">Регистрация</a>
+        <a href="{{ url_for('login') }}" class="btn me-2"
+           style="color: white; border-color: rgba(73, 113, 191, 0.7)">Войти</a>
+        <a href="{{ url_for('register') }}" class="btn"
+           style="color: white; border-color: rgba(73, 113, 191, 0.7)">Регистрация</a>
       </div>
-      {% endif %}
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            {% block catalog_link %}<a class="nav-link" href="{{ url_for('catalog') }}">Каталог</a>{% endblock catalog_link %}
-          </li>
-          <li class="nav-item">
-            {% block news_link %}<a class="nav-link" href="#">Новости</a>{% endblock news_link %}
-          </li>
-        </ul>
-        <form class="d-flex my-search-form" action="{{ url_for('search') }}" method="post">
-          <input class="form-control search-text" placeholder="Поиск" aria-label="Search" style="background-color: #151F55; border-color: rgba(73, 113, 191, 0.7)" name="searchInput">
-          <button type="submit" class="btn no-focus my-search-icon p-0 m-0" style="background: transparent"><i class="bi bi-search" style="color: white"></i></button>
-        </form>
-      </div>
-      {% if current_user.is_authenticated %}
-        <div class="dropdown">
-          <button class="mx-3" id="messageDropDown" data-bs-toggle="dropdown" aria-expanded="false" style="background: none; border: none"><i class="bi bi-bell" style="color: white"></i></button>
-
-          <ul class="dropdown-menu" aria-labelledby="messageDropDown" style="right: 0; left: auto; min-width: 30vw; max-width: 100vw; max-height: 90vh; overflow: scroll">
-            {% for i in range(5) %}
-              <li class="dropdown-item me-0 ms-auto">
-                 <div class="container border rounded pt-2 w-80" style="overflow: scroll">
-                    <div class="row">
-                      <div class="col-8">
-                        <h5 style="white-space: normal">Уведомление №{{ loop.index }}</h5>
-                      </div>
-                      <div class="col-4">
-                        <i class="bi bi-x float-end"></i>
-                      </div>
-                    </div>
-                   <hr>
-                    <div class="row" style="max-width: 100%">
-                     <div class="col-12">
-                       <p class="fw-normal p-0 m-0" style="white-space: normal">Тут расположен основной текст уведомления {{ i }} sdfsdgsddsfsdfsdfdfssadftrtrgtrt</p>
-                     </div>
-                    </div>
-
-                 </div>
-
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-
-      {% endif %}
+    {% endif %}
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          {% block catalog_link %}
+            <a class="nav-link" href="{{ url_for('catalog') }}">Каталог</a>{% endblock catalog_link %}
+        </li>
+      </ul>
+      <form class="d-flex my-search-form" action="{{ url_for('search') }}" method="post">
+        <input class="form-control search-text" placeholder="Поиск" aria-label="Search"
+               style="background-color: #151F55; border-color: rgba(73, 113, 191, 0.7)"
+               name="searchInput">
+        <button type="submit" class="btn no-focus my-search-icon p-0 m-0"
+                style="background: transparent"><i class="bi bi-search" style="color: white"></i>
+        </button>
+      </form>
     </div>
-  </nav>
-  <!---->
-  {% with messages = get_flashed_messages(with_categories=true) %}
+  </div>
+</nav>
+<!---->
+{% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <div class="w-50 mx-auto mt-3">
       {% for category, message in messages %}
-      <div role="alert" class="alert {% if category != 'message' %}alert-{{ category }}{% else %}alert-info{% endif %} alert-dismissible mb-1">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
-      </div>
+        <div role="alert" class="alert {% if category != 'message' %}alert-{{ category }}{% else %}alert-info{% endif %} alert-dismissible mb-1">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+        </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   {% endif %}
   {% endwith %}
   <!---->
@@ -110,19 +91,25 @@
   </div>
 
   <!---->
-  <footer class="footer d-flex flex-wrap justify-content-between align-items-center py-4" id="footer">
-    <div class="col-md-4" style="text-align: center">
+  <footer class="footer d-flex flex-wrap justify-content-between align-items-center py-4 row mx-0 px-0" id="footer" style="">
+    <div class="col-md-6">
+      <a href="/" class="me-2 mb-md-0 text-muted text-decoration-none lh-1">
+        <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+      </a>
       <span style="color: rgb(160, 160, 160)">© 2022 Practice Hub, Inc</span>
     </div>
 
-    <div class="col-md-4" style="text-align: center">
-      <a style="color: rgb(50, 50, 50)">Контакты</a><br>
-      <a style="color: rgb(50, 50, 50)">О проекте</a>
-    </div>
-
-    <div class="col-md-4" style="text-align: center">
-      <a href='{{ url_for("api") }}' style="color: rgb(50, 50, 50); text-decoration: none">API</a><br>
-      <a href='{{ url_for("tags") }}' style="color: rgb(50, 50, 50); text-decoration: none">Документация по тегам</a><br>
+    <div class="col-md-6 pe-5">
+      <div class="float-end md-fullsize d-flex justify-content-between" style="width: 65%">
+        <div class="me-4">
+          <a style="color: rgb(50, 50, 50)">Контакты</a><br>
+          <a style="color: rgb(50, 50, 50)">О проекте</a>
+        </div>
+        <div>
+          <a href='{{ url_for("tags") }}' style="color: rgb(50, 50, 50); text-decoration: none">Документация по тегам</a><br>
+          <a href='{{ url_for("api") }}' style="color: rgb(50, 50, 50); text-decoration: none">API</a>
+        </div>
+      </div>
     </div>
   </footer>
   {# scripts #}
@@ -133,12 +120,12 @@
         $('#content').css('min-height', `calc(100vh - ${$("#header").outerHeight()}px - ${$("#footer").outerHeight(true)}px - ${$("#fullsize-content").outerHeight(true)}px)`);
       });
 
-      function ss() {
+    function ss() {
         console.log('{{ url_for("search", pre_search="' + document.getElementById('searchInput()').textContent + '") }}');
         window.location.href = '{{ url_for("search", pre_search="' + document.getElementById('searchInput()').textContent + '") }}'
-      }
-  </script>
-  {% block script %}
-  {% endblock script %}
+    }
+</script>
+{% block script %}
+{% endblock script %}
 </body>
 </html>

@@ -3,7 +3,7 @@
 {% block title %}Преподавание{% endblock title %}
 {% block content %}
 <div class="w-50 px-0 m-auto">
-  <div class="mx-auto rounded-pill justify-content-between d-flex align-items-center p-2 teaching" style="background-color: rgb(230, 230, 230); width: 85%; height: 80%;">
+  <div class="mx-auto rounded-pill justify-content-between d-flex align-items-center p-2 teaching md-fullsize" style="background-color: rgb(230, 230, 230); height: 80%;">
     <button class="rounded-pill px-1 btn no-focus toggler-active" id="check" style="width: 45%; font-weight: 500;">
       <span class="h4">Проверка</span>
       </button>
@@ -12,8 +12,8 @@
     </button>
   </div>
 </div>
-<div class="w-75 px-0 justify-content-end align-items-center d-flex my-4 mx-auto">
-  <a href="{{ url_for('create_course') }}" class="btn py-auto w-25 d-none mx-auto mbgc" id="create"><span class="h5">Создать курс&nbsp;<i class="bi bi-plus-circle"></i></span></a>
+<div class="w-75 px-0 justify-content-end align-items-center d-flex my-4 mx-auto md-fullsize">
+  <a href="{{ url_for('create_course') }}" class="btn py-auto w-25 d-none mx-auto mbgc md-fullsize" id="create"><span class="h5">Создать курс&nbsp;<i class="bi bi-plus-circle"></i></span></a>
 </div>
 {# content #}
 <div class="mx-auto" style="width: 65%">

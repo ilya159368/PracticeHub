@@ -48,15 +48,11 @@ class SearchForm(FlaskForm):
 class EditPassword(FlaskForm):
     old_password = PasswordField('Старый пароль', validators=[DataRequired()])
 
-    password1 = PasswordField('Новый пароль', validators=[DataRequired()])
+    password1 = PasswordField('Новый пароль', validators=[DataRequired(), EqualTo('password2', message='Пароли не совпадают')])
     password2 = PasswordField(
-        'Повторите пароль', validators=[DataRequired(), EqualTo('password1')])
+        'Повторите пароль', validators=[DataRequired(), EqualTo('password1', message='Пароли не совпадают')])
 
     submit = SubmitField('Изменить')
-
-    def validate_password(self, usr, pwd):
-        if not usr.check_password(pwd):
-            raise ValidationError('Wrong old password')
 
 
 class EditMainInfo(FlaskForm):

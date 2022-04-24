@@ -92,6 +92,7 @@ body {
 .catalog:hover {
 	background-color: rgba(148,63,251,1);
 	box-shadow: 0 10px 5rem rgba(148,63,251,0.5);
+    color: white;
 }
 
 .catalog {

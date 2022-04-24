@@ -1,67 +1,77 @@
 {% extends 'base.html' %}
 {% block title %} {{ course.name[:20] }} {% endblock title %}
 {% block fullsize_content %}
-<div class="container-fluid pt-5 my-auto pb-5 mb-4 px-0" style="background-color: #243042; overflow-x: hidden">
+  <div class="container-fluid pt-5 my-auto pb-5 mb-4"
+       style="background-color: #243042; overflow-x: hidden">
     <div class="row">
-        <div class="col-md-6" style="margin-left: 20vw;">
-            <h2 class="display-5 fw-bold" style="color: white;">{{ course.name }}</h2>
-            <p class="fs-4 text-break mb-0 me-5 d-block" style="color: white;">
-                 {{ course.short_desc }}
-            </p>
-        </div>
+      <div class="col-md-2"></div>
+      <div class="col-md-6">
+        <h2 class="display-5 fw-bold" style="color: white;">{{ course.name }}</h2>
+        <p class="fs-4 text-break mb-0 me-5 d-block" style="color: white;">
+          {{ course.short_desc }}
+        </p>
+      </div>
 
-        <div class="col-md-4 me-auto align-self-end fs-5" style="color: white; width: auto; margin-right: 20vw;">
-            {{ course.users|length }} <i class="bi bi-people-fill" style="color: white;"> учащихся</i><br>
-        </div>
+      <div class="col-lg-3 col-md-4 fs-5" style="color: white;">
+        <form action="{{ url_for('like', course_id=course.id) }}" method="post" class="ms-auto my-w-75 px-2 md-fullsize">
+          {{ like_cnt }} <button type="submit" class="btn p-0 me-2" {% if not started %}disabled{% endif %} title="Поступите на курс, чтобы оценить его"><i class="bi bi-heart-fill {% if liked %}liked{% else %}unliked{% endif %}" style="font-size: xx-large"></i></button> оценивших<br>
+          {{ course.users|length }} <i class="bi bi-people-fill me-3" style="color: white;"></i>учащихся<br>
+        </form>
+      </div>
+      <div class="col-lg-1"></div>
     </div>
-</div>
-<div class="container-fluid px-0">
-    <div class="row w-100">
-        <div class="col-md-6" style="margin-left: 20vw;">
-            <h4>О курсе</h4>
-            <p class="fs-6">{{ formatted_desc|safe }}</p>
+  </div>
+  <div class="container-fluid px-0">
+    <div class="row w-100 ms-auto me-3">
+      <div class="col-md-2"></div>
+      <div class="col-md-6" style="">
+        <h4>О курсе</h4>
+        <p class="fs-6">{{ formatted_desc|safe }}</p>
+      </div>
+      <div class="col-md-3" style="">
+        <div class="row my-w-75 ms-auto md-fullsize">
+          {% if started %}
+            <a class="btn btn-success w-100 d-block" href="{{ url_for('lessons', course_id=course.id) }}">Перейти к
+              урокам</a>
+          {% else %}
+            <form action="" method="post">
+              <button class="btn btn-success w-100">Поступить на курс</button>
+            </form>
+          {% endif %}
         </div>
 
-        <div class="col-md-4 me-auto" style="width: auto; margin-right: 20vw;">
-            <div class="row">
-                <!--<h2>Цена</h2>-->
-                {% if started %}
-                <a class="btn btn-success" href="{{ url_for('lessons', course_id=course.id) }}">Перейти к урокам</a>
-                {% else %}
-                <form action="" method="post">
-                  <button class="btn btn-success w-100">Поступить на курс</button>
-                </form>
-                {% endif %}
-            </div>
-
-            <div class="row py-3 px-2 mt-4" style="background-color: #ededed;">
-                <p class="fs-6 fw-bold">В курс входят</p>
-                <div class="d-flex flex-column">
-                    <span class="my-2">Уроков: <span class="fw-bold fs-6">{{ course_cnt }}</span></span>
-                    <span class="my-2">Домашних заданий: <span class="fw-bold fs-6">{{ hw_cnt }}</span></span>
-                </div>
-            </div>
-
-            {% if course.author_id == current_user.id %}
-                <div class="row py-3 px-2 mt-4">
-                    <form action="{{ url_for('on_publish', course_id=course.id) }}" method="post" id="published_form">
-                        <input type="checkbox" class="form-check-input published_check" id="published_check" {% if published %} checked {% endif %}>
-                        <label class="form-check-label" for="published_check">Опубликовать</label>
-                    </form>
-                </div>
-            {% endif %}
+        <div class="row py-3 px-2 mt-4 my-w-75 ms-md-auto md-fullsize" style="background-color: #ededed;">
+          <p class="fs-6 fw-bold">В курс входят</p>
+          <div class="d-flex flex-column">
+            <span class="my-2">Уроков: <span class="fw-bold fs-6">{{ course_cnt }}</span></span>
+            <span class="my-2">Домашних заданий: <span
+                class="fw-bold fs-6">{{ hw_cnt }}</span></span>
+          </div>
         </div>
+
+        {% if course.author_id == current_user.id %}
+          <div class="row mt-4 my-w-75 ms-auto md-fullsize">
+            <form action="{{ url_for('on_publish', course_id=course.id) }}" method="post" class="px-0"
+                  id="published_form">
+              <input type="checkbox" class="form-check-input published_check" id="published_check"
+                  {% if published %} checked {% endif %}>
+              <label class="form-check-label" for="published_check">Опубликовать</label>
+            </form>
+          </div>
+        {% endif %}
+      </div>
+      <div class="col-lg-1"></div>
     </div>
-</div>
+  </div>
 {% endblock fullsize_content %}
 
 {% block script %}
-<script>
-    $(function () {
-        $("#published_check").click(function () {
-            $("#published_form").submit();
-            console.log("checkbox_click");
-        });
-    });
-</script>
+  <script>
+      $(function () {
+          $("#published_check").click(function () {
+              $("#published_form").submit();
+              console.log("checkbox_click");
+          });
+      });
+  </script>
 {% endblock script %}
