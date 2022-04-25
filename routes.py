@@ -368,8 +368,8 @@ def edit_profile(id):
         if f:
             filename = f.filename
             if not allowed_file(filename):
-                # TODO: do smth
-                ...
+                flash("Недопустимый файл", "danger")
+                return redirect(url_for('profile', id=id))
             _uuid = uuid4().hex
             ext = filename.split('.')[-1]
             path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'],
