@@ -114,6 +114,7 @@ body {
 .glow-button:hover {
 	background-color: rgba(27,59,139,1);
 	box-shadow: 0 10px 5rem rgba(27,59,139, 0.5);
+	color: white;
 }
 
 .glow-button {

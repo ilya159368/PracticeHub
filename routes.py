@@ -23,13 +23,13 @@ def catalog():
     courses = Course.query.filter(Course.is_published == True).order_by(Course.likes.desc()).limit(20).all()
     # like_cnt_lst = db.engine.execute(
     #     f'select liked from course c left join my_courses mc on mc.course_id = c.id where c.author_id = {current_user.id}').all()
-    return render_template('index.html', courses=courses)
+    return render_template('catalog.html', courses=courses)
 
 
 @app.route("/")
 @app.route("/index")
 def promo():
-    return render_template("promo.html")
+    return render_template("index.html")
 
 
 @app.route('/favicon.ico', methods=['GET', 'POST'])
@@ -368,8 +368,8 @@ def edit_profile(id):
         if f:
             filename = f.filename
             if not allowed_file(filename):
-                # TODO: do smth
-                ...
+                flash("Недопустимый файл", "danger")
+                return redirect(url_for('profile', id=id))
             _uuid = uuid4().hex
             ext = filename.split('.')[-1]
             path = os.path.join(app.config['UPLOAD_FOLDER'], app.config['UPLOAD_IMG_SUBFOLDER'],
